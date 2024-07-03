@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: wishgen-db
+      POSTGRES_USER: wishgen-user
+      POSTGRES_PASSWORD: wishgen-password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  db_data:
