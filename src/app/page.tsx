@@ -6,34 +6,36 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import UploadForm from '@/app/components/S3UploadForm';
 
 export default function Component() {
   const [message, setMessage] = useState('');
-  const [picture, setPicture] = useState(null);
-  const [video, setVideo] = useState(null);
+  const [picture, setPicture] = useState<File | null>(null);
+  const [video, setVideo] = useState<File | null>(null);
   const [generatedUrl, setGeneratedUrl] = useState('');
 
-  const handleSubmit = async (event: any) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const formData = new FormData();
     formData.append('context', message);
     if (picture) formData.append('images', picture);
     if (video) formData.append('video', video);
-
+    
     try {
       const response = await fetch('/api/gift-card', {
         method: 'POST',
         body: formData,
       });
 
-      const result = await response.json();
-
-      console.log(result);
-      if (response.ok) {
-        setGeneratedUrl(result.url);
-      } else {
+      if (!response.ok) {
+        const result = await response.json();
         setGeneratedUrl(`Error: ${result.error}`);
+        return;
       }
+
+      const result = await response.json();
+      setGeneratedUrl(result.url);
+
     } catch (error: any) {
       console.error('Error:', error);
       setGeneratedUrl(`Error: ${error.message}`);
@@ -61,22 +63,15 @@ export default function Component() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
-              <div className="grid w-full max-w-sm items-center gap-1.5 my-5">
-                <Label htmlFor="picture">Picture</Label>
-                <Input
-                  id="picture"
-                  type="file"
-                  //@ts-ignore
-                  onChange={(e) => setPicture(e.target.files[0])}
-                />
-              </div>
+              <div className="bg-card rounded-lg shadow-lg p-6 mt-6">
+                <UploadForm />
+                </div>
               <div className="grid w-full max-w-sm items-center gap-1.5 my-5">
                 <Label htmlFor="video">Video</Label>
                 <Input
                   id="video"
                   type="file"
-                  //@ts-ignore
-                  onChange={(e) => setVideo(e.target.files[0])}
+                  onChange={(e) => setVideo(e.target.files ? e.target.files[0] : null)}
                 />
               </div>
             </div>
@@ -107,6 +102,7 @@ export default function Component() {
             </div>
           )}
         </div>
+        
       </div>
     </div>
   );

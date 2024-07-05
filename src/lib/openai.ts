@@ -12,7 +12,7 @@ async function askGpt(prompt: any) {
       {
         role: 'system',
         content:
-          'You are professional gift card website generator. You have to generate a wishes JSON data',
+          'You are professional gift card website generator. You have to generate wishes JSON data',
       },
       {
         role: 'user',

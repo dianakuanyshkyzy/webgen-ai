@@ -9,5 +9,12 @@ datasource db {
 
 model Wish {
     id       Int  @id @default(autoincrement())
-    wishData Json
+    wishData Json   
+}
+model Image {
+  id        Int     @id @default(autoincrement())
+  url       String
+  wishId    Int
+  wish      Wish    @relation(fields: [wishId], references: [id])
+  createdAt DateTime @default(now())
 }
