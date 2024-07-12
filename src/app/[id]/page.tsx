@@ -3,10 +3,10 @@
 import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import DadHomePage from '@/components/DadHomePage';
 import S3UploadForm from '@/components/S3UploadForm';
-import MomHomePage from '@/components/MomHomeHage';
 import Girlfriend from '@/components/Girlfriend';
+import Boyfriend from '@/components/Boyfriend';
+
 interface WishData {
   title: string;
   about: string;
@@ -17,7 +17,10 @@ interface WishData {
   wishes: string[];
   hobbies: string[];
   short_paragraph: string;
+  characteristics: string[];
+  facts: string[];
   senders: string;
+  componentType: string;
 }
 
 const GiftCardPage: React.FC = () => {
@@ -43,9 +46,13 @@ const GiftCardPage: React.FC = () => {
     <div>
       {wishJsonData ? (
         <>
-           {/* <DadHomePage wishData={wishJsonData.wishData} id={id}/>    */}
-      {/*<MomHomePage wishData={wishJsonData.wishData} id={id}/>*/}
-          <Girlfriend wishData={wishJsonData.wishData} id={id}/>
+          {wishJsonData.wishData.webData?.componentType === 'girl' ? (
+            <Girlfriend wishData={wishJsonData.wishData} id={id} />
+          ) : wishJsonData.wishData.webData?.componentType === 'boy' ? (
+            <Boyfriend wishData={wishJsonData.wishData} id={id} />
+          ) : (
+            <div>Component type not recognized</div>
+          )}
           <S3UploadForm onUpload={(file) => console.log('Uploaded file:', file)} id={id} />
         </>
       ) : (

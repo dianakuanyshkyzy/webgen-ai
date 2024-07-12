@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
- 
+import { useSpring, animated } from 'react-spring';
 
 interface WishData {
   title: string;
@@ -14,12 +14,26 @@ interface WishData {
   characteristics: string[];
   short_paragraph: string;
   senders: string;
+  gender: string;
+  componentType:string;
 }
 
 interface GirlfriendProps {
   wishData: WishData;
   id: string;
 }
+
+
+const WaveImage: React.FC<{ src: string }> = ({ src }) => {
+  const props = useSpring({
+    loop: true,
+    to: [{ transform: 'translateY(0px)' }, { transform: 'translateY(-20px)' }],
+    from: { transform: 'translateY(-20px)' },
+    config: { duration: 2000 }
+  });
+
+  return <animated.img src={src} style={props} className="w-full" />;
+};
 
 const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
   const {webData} = wishData; 
@@ -87,10 +101,10 @@ return (
           <div className="my-auto">WebGenAI</div>
         </div>
         <div className="flex gap-5 justify-between self-stretch my-auto text-xl font-medium leading-6 max-md:flex-wrap">
-          <li>Wishes</li>
-          <li>Memories</li>
-          <li>Facts</li>
-          <li>Suprise</li>
+        <a href="#wishes-section">Wishes</a>
+        <a href="#memories-section">Memories</a>
+        <a href="#facts-section">Facts</a>
+        <a href="#surprise-section">Surprise</a>
 
         </div>
         
@@ -117,7 +131,7 @@ return (
         </div>
       </div>
     </div>
-    <div className="flex justify-center items-center px-16 py-16 w-full bg-stone-100 max-md:px-5 max-md:max-w-full">
+    <div id="wishes-section" className=" flex justify-center items-center px-16 py-16 w-full bg-stone-100 max-md:px-5 max-md:max-w-full">
       <div className="flex flex-col w-full max-w-[1192px] max-md:max-w-full">
         <div className="self-center text-6xl font-bold text-center text-gray-800 w-[922px] max-md:max-w-full max-md:text-4xl">
           Let's see what what your loved ones wish you:
@@ -206,30 +220,62 @@ return (
         </div>
       </div>
 
-      
-
-      <div className="flex justify-center items-center px-16 py-16 w-full text-6xl font-bold text-center text-gray-800 bg-stone-100 max-md:px-5 max-md:max-w-full max-md:text-4xl">
+      {/* <div className="flex justify-center items-center px-16 py-16 w-full text-6xl font-bold text-center text-gray-800 bg-stone-100 max-md:px-5 max-md:max-w-full max-md:text-4xl">
         <div className="flex flex-col max-w-full w-[922px] max-md:text-4xl">
           <div className="max-md:max-w-full max-md:text-4xl">
             Thank you for the memories!
           </div>
           <div className="relative mt-16 w-full aspect-[1.79] max-md:mt-10 max-md:max-w-full">
-            {images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt={`Floating image ${index + 1}`}
-                className="absolute floating-image"
-                style={{
-                  top: `${Math.random() * 80}%`,
-                  left: `${Math.random() * 80}%`,
-                  width: `${Math.random() * 10 + 10}%`,
-                }}
-              />
-            ))}
+          
+          {images.length > 0 ? (
+            images.map((image, index) => (
+              <WaveImage src={image} key={index} />
+              ))
+          ) : (
+            <p>No images available</p>
+          )}
           </div>
         </div>
+      </div> */}
+            
+      <div id="memories-section"className="self-center text-6xl font-bold text-center text-gray-800 w-[922px] max-md:max-w-full max-md:text-4xl mb-10">
+            Thank you for the memories!
+
+
+        </div>
+<div className="relative w-full max-w-5xl mx-auto">
+
+      <div
+        className="group flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide transition-all duration-300 ease-in-out"
+        onMouseEnter={(e) => {
+          const carousel = e.currentTarget
+          const speed = 0.1
+          const handleMouseMove = (e: any) => {
+            const { clientX, currentTarget } = e
+            const { left, right, width } = currentTarget.getBoundingClientRect()
+            const position = (clientX - left) / width
+            carousel.scrollLeft +=
+              (position < 0.5 ? -1 : 1) * speed * (Math.abs(0.5 - position) * 2) * carousel.scrollWidth
+          }
+          carousel.addEventListener("mousemove", handleMouseMove)
+          return () => {
+            carousel.removeEventListener("mousemove", handleMouseMove)
+          }
+        }}
+        onMouseLeave={() => {}}
+      >  {images.length > 0 ? (
+        images.map((image, index) => (
+          <img src={image} key={index} width={600}
+          height={400} className="object-cover rounded-lg aspect-video shrink-0 w-full max-w-[400px]"/>
+          ))
+      ) : (
+        <p>No images available</p>
+      )} 
       </div>
+      <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+    </div>
+
     <div className="pt-16 pb-10 pl-20 w-full bg-stone-100 max-md:pl-5 max-md:max-w-full">
       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
       <div className="flex flex-col ml-5 w-[21%] max-md:ml-0 max-md:w-full">
@@ -239,24 +285,14 @@ return (
             className="grow shrink-0 mt-16 max-w-full aspect-[0.53] fill-fuchsia-300 w-[249px] max-md:mt-10 transform scaleX-[-1]"
           />
         </div>
-        <div className="flex flex-col w-[79%] max-md:ml-0 max-md:w-full">
+        <div id="facts-section"className="flex flex-col w-[79%] max-md:ml-0 max-md:w-full">
           <div className="flex flex-col font-bold text-center text-gray-800 max-md:mt-10 max-md:max-w-full">
             <div className="text-6xl max-md:max-w-full max-md:text-4xl">
-              We do it for you. No more
-              <br />
-              struggling to grow on
-              <br />
-              any Platform
+             {webData.short_paragraph}
             </div>
             <div className="mt-16 text-3xl max-md:mt-10 max-md:max-w-full">
-              Work with our expert strategists
-              <br />
-              writers, editors, and producers to create content
-              <br />
-              that transforms your content
             </div>
             <div className="self-center mt-16 text-xl leading-8 w-[691px] max-md:mt-10 max-md:max-w-full">
-              {wishData.short_paragraph} <span className="font-medium">The Creator</span>
             </div>
           </div>
         </div>
@@ -269,22 +305,17 @@ return (
         </div>
       </div>
     </div>
-    <div className="flex justify-center items-center px-16 py-16 mt-1 w-full bg-stone-100 max-md:px-5 max-md:max-w-full">
+    {/* <div className="flex justify-center items-center px-16 py-16 mt-1 w-full bg-stone-100 max-md:px-5 max-md:max-w-full">
       <div className="flex flex-col max-w-full w-[1022px]">
         <div className="mx-6 max-md:mr-2.5 max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col max-md:gap-0">
             <div className="flex flex-col w-[45%] max-md:ml-0 max-md:w-full">
               <div className="flex flex-col text-gray-800 max-md:mt-8 max-md:max-w-full">
                 <div className="text-4xl font-bold max-md:max-w-full">
-                  1# Research & Analysis
+                  {webData.recipient} ...
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
-                  Our agency's research-driven approach involves gathering
-                  insights into our clients' industries, competitors, and
-                  target audiences to develop tailored strategies that deliver
-                  exceptional results. This deep understanding allows us to
-                  create innovative and effective campaigns that resonate with
-                  our clients' audiences.
+                  {webData?.facts[0]}
                 </div>
               </div>
             </div>
@@ -309,12 +340,10 @@ return (
             <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
               <div className="flex flex-col text-gray-800 max-md:mt-8 max-md:max-w-full">
                 <div className="text-4xl font-bold max-md:max-w-full">
-                  2# Concept development:
+                {webData.recipient}...
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
-                  Based on the brief and research, the agency's creative team
-                  generates ideas for the campaign. These concepts are
-                  presented to the client for feedback and refinement.
+                {webData.facts[1]}
                 </div>
               </div>
             </div>
@@ -325,12 +354,10 @@ return (
             <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
               <div className="flex flex-col text-gray-800 max-md:mt-8 max-md:max-w-full">
                 <div className="text-4xl font-bold max-md:max-w-full">
-                  3# Design and execution:
+                {webData.recipient} ...
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
-                  Once the concept is approved, the agency's designers and
-                  developers bring it to life. This includes creating visual
-                  assets, writing copy, and developing multimedia content.
+                {webData.facts[2]}
                 </div>
               </div>
             </div>
@@ -556,7 +583,7 @@ return (
         
 
       </div>
-      </div>
+      </div> */}
     </div>
   
 );
