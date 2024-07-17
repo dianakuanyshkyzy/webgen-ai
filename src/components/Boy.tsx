@@ -18,6 +18,7 @@ interface WishData {
   senders: string;
   gender: string;
   componentType:string; 
+  poemabout: string;
 }
 
 interface BoyfriendProps {
@@ -113,8 +114,28 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
                 </div>
               )) : (
                 <div className="text-[#d1d5db]">No memories available</div>
-              )}
+              )
+              }
+               {videos.length > 0 ? (
+      videos.map((video, index) => (
+        <div key={index} className="rounded-lg bg-[#374151] p-6 shadow-lg">
+          <video
+            src={video}
+            controls
+            className="mb-4 rounded-lg"
+            width="100%"
+            height="auto"
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      ))
+    ) : (
+      <div className="text-[#d1d5db]">No memories available</div>
+    )}
+              
             </div>
+            
           </div>
         </section>
         <section id="facts" className="bg-[#1f2937] py-16">

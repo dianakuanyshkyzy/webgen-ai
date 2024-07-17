@@ -4,9 +4,14 @@ import axios from 'axios';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import S3UploadForm from '@/components/S3UploadForm';
-import Girlfriend from '@/components/Girlfriend';
-import Boyfriend from '@/components/Boyfriend';
-
+import Girlfriend from '@/components/Girl';
+import Boyfriend from '@/components/Boy';
+import Child from '@/components/Child';
+import Anniversary from '@/components/Anniversary';
+import ThankYou from '@/components/Thankyou';
+import GetWell from '@/components/GetWell';
+import Invitation from '@/components/Invitation';
+import Graduation from '@/components/Graduation';
 interface WishData {
   title: string;
   about: string;
@@ -21,6 +26,7 @@ interface WishData {
   facts: string[];
   senders: string;
   componentType: string;
+  poemabout: string;
 }
 
 const GiftCardPage: React.FC = () => {
@@ -43,21 +49,37 @@ const GiftCardPage: React.FC = () => {
   }, [id]);
 
   return (
+
     <div>
+      
       {wishJsonData ? (
         <>
           {wishJsonData.wishData.webData?.componentType === 'girl' ? (
             <Girlfriend wishData={wishJsonData.wishData} id={id} />
           ) : wishJsonData.wishData.webData?.componentType === 'boy' ? (
             <Boyfriend wishData={wishJsonData.wishData} id={id} />
-          ) : (
-            <div>Component type not recognized</div>
-          )}
-          <S3UploadForm onUpload={(file) => console.log('Uploaded file:', file)} id={id} />
+          ) : wishJsonData.wishData.webData?.componentType === 'child' ? (
+            <Child wishData={wishJsonData.wishData} id={id} />
+          ): wishJsonData.wishData.webData?.componentType === 'anniversary' ? (
+            <Anniversary wishData={wishJsonData.wishData} id={id} />
+          ):
+          wishJsonData.wishData.webData?.componentType === 'thank_you' ? (
+            <ThankYou wishData={wishJsonData.wishData} id={id} />
+          ):
+          wishJsonData.wishData.webData?.componentType === 'get_well' ? (
+            <GetWell wishData={wishJsonData.wishData} id={id} />
+          ):
+          wishJsonData.wishData.webData?.componentType === 'invitation' ? (
+            <Invitation wishData={wishJsonData.wishData} id={id} />
+          ):
+          wishJsonData.wishData.webData?.componentType === 'graduation' ? (
+            <Graduation wishData={wishJsonData.wishData} id={id} />
+          ):
+           null}
         </>
       ) : (
         <div>Loading...</div>
-      )}
+      )} 
     </div>
   );
 };
