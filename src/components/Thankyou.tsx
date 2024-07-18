@@ -1,9 +1,8 @@
+'use client';
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from 'react';
-import { useSpring, animated } from 'react-spring';
 
 interface WishData {
   title: string;
@@ -19,7 +18,7 @@ interface WishData {
   short_paragraph: string;
   senders: string;
   gender: string;
-  componentType:string;
+  componentType: string;
   poemabout: string;
 }
 
@@ -28,12 +27,15 @@ interface ThankyouProps {
   id: string;
 }
 
-
 const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
-  const {webData} = wishData; 
+  const { webData } = wishData;
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showSurprise, setShowSurprise] = useState(false);
+  const [generatedMusic, setGeneratedMusic] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -63,260 +65,177 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
     }
   }, [id]);
 
-  console.log(wishData); 
   const handleNextWish = () => {
     setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
   };
 
-  const handlePrevWish = () => {
-    setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
-  };
   useEffect(() => {
     const interval = setInterval(() => {
       handleNextWish();
     }, 5000);
-    return () => clearInterval(interval); // Cleanup the interval on component unmount
+    return () => clearInterval(interval);
   }, [webData.wishes.length]);
+
+  const openImage = (image: string) => {
+    setSelectedImage(image);
+  };
+
+  const closeImage = () => {
+    setSelectedImage(null);
+  };
+
+  const toggleSurprise = async () => {
+    setShowSurprise(!showSurprise);
+    if (!showSurprise) {
+      try {
+        setLoading(true);
+        console.log('Sending request to generate music with prompt:', webData.recipient);
+        const response = await fetch('/api/generate-songs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ prompt: webData.recipient, make_instrumental: false, wait_audio: true }),
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          console.log('Received response:', data);
+          setGeneratedMusic(data[0].audio_url);
+        } else {
+          console.error('Error:', data.error);
+        }
+      } catch (error) {
+        console.error('Error generating music:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   if (!webData) {
-    return <div>Loading...</div>; // Adjust this to your preferred loading state
+    return <div>Loading...</div>;
   }
+
   return (
-    <div className="bg-background text-foreground">
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+    <div style={{ fontFamily: "'Roboto', sans-serif", background: "#f5f5f0", color: "#3b3b3b", padding: '20px' }}>
+      <header style={{ position: 'sticky', top: '0', zIndex: '50', background: 'rgba(245, 245, 240, 0.9)', backdropFilter: 'blur(10px)', padding: '10px 0' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' }}>
           <Link href="#" prefetch={false}>
             <GiftIcon className="h-6 w-6" />
             <span className="sr-only">Thank You Notes</span>
           </Link>
-          <nav className="hidden space-x-4 md:flex">
-            <Link href="#" className="text-sm font-medium transition-colors hover:text-primary" prefetch={false}>
-              Features
-            </Link>
-            <Link href="#" className="text-sm font-medium transition-colors hover:text-primary" prefetch={false}>
-              Testimonials
-            </Link>
-            <Link href="#" className="text-sm font-medium transition-colors hover:text-primary" prefetch={false}>
-              Pricing
-            </Link>
-            <Link href="#" className="text-sm font-medium transition-colors hover:text-primary" prefetch={false}>
-              FAQ
-            </Link>
-            <Link href="#" className="text-sm font-medium transition-colors hover:text-primary" prefetch={false}>
-              Contact
-            </Link>
+          <nav style={{ display: 'flex', gap: '20px' }}>
+            <Link href="#" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Images</Link>
+            <Link href="#" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Videos</Link>
+            <Link href="#" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Messages</Link>
           </nav>
           <Button>Get Started</Button>
         </div>
       </header>
       <main>
-        <section className="bg-gradient-to-r from-primary to-primary-foreground py-24 text-center text-primary-foreground">
-          <div className="container mx-auto px-4 md:px-6">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">Personalized Thank You Notes</h1>
-            <p className="mx-auto mt-4 max-w-3xl text-lg md:text-xl">
-              Express your gratitude in a unique and thoughtful way with our personalized thank you note service.
+        <section style={{ background: 'linear-gradient(to right, #f7c8d0, #f5f5dc)', padding: '60px 20px', textAlign: 'center' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <h1 style={{ fontSize: '3em', fontWeight: 'bold', color: '#3b3b3b' }}>{webData.title}</h1>
+            <p style={{ marginTop: '20px', maxWidth: '600px', margin: '0 auto', fontSize: '1.25em', color: '#3b3b3b' }}>
+              {webData.about}
             </p>
-            <div className="mt-8">
-              <Button variant="secondary">Get Started</Button>
-            </div>
           </div>
         </section>
-        <section id="features" className="py-24">
-          <div className="container mx-auto grid grid-cols-1 gap-8 px-4 md:grid-cols-2 md:px-6">
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative h-64 w-full overflow-hidden rounded-lg">
-                <img
-                  src="/placeholder.svg"
-                  alt="Feature 1"
-                  className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-500 hover:opacity-100">
-                  <PlayIcon className="h-12 w-12 text-white" />
-                </div>
-              </div>
-              <h3 className="mt-4 text-xl font-semibold">Personalized Designs</h3>
-              <p className="mt-2 text-muted-foreground">
-                Choose from a variety of unique and elegant designs to make your thank you note truly special.
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative h-64 w-full overflow-hidden rounded-lg">
-                <img
-                  src="/placeholder.svg"
-                  alt="Feature 2"
-                  className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-500 hover:opacity-100">
-                  <PlayIcon className="h-12 w-12 text-white" />
-                </div>
-              </div>
-              <h3 className="mt-4 text-xl font-semibold">Handwritten Touches</h3>
-              <p className="mt-2 text-muted-foreground">
-                Our team of skilled calligraphers will add a personal touch to your note, making it feel truly
-                heartfelt.
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative h-64 w-full overflow-hidden rounded-lg">
-                <img
-                  src="/placeholder.svg"
-                  alt="Feature 3"
-                  className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-500 hover:opacity-100">
-                  <PlayIcon className="h-12 w-12 text-white" />
-                </div>
-              </div>
-              <h3 className="mt-4 text-xl font-semibold">Sustainable Materials</h3>
-              <p className="mt-2 text-muted-foreground">
-                Our thank you notes are made with eco-friendly materials, ensuring your gratitude is expressed in a
-                sustainable way.
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative h-64 w-full overflow-hidden rounded-lg">
-                <img
-                  src="/placeholder.svg"
-                  alt="Feature 4"
-                  className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-500 hover:opacity-100">
-                  <PlayIcon className="h-12 w-12 text-white" />
-                </div>
-              </div>
-              <h3 className="mt-4 text-xl font-semibold">Timely Delivery</h3>
-              <p className="mt-2 text-muted-foreground">
-                We understand the importance of timely gratitude, so we offer fast and reliable delivery to ensure your
-                thank you note arrives on time.
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative h-64 w-full overflow-hidden rounded-lg">
-                <img
-                  src="/placeholder.svg"
-                  alt="Feature 5"
-                  className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-500 hover:opacity-100">
-                  <PlayIcon className="h-12 w-12 text-white" />
-                </div>
-              </div>
-              <h3 className="mt-4 text-xl font-semibold">Personalized Messages</h3>
-              <p className="mt-2 text-muted-foreground">
-                Craft a heartfelt message that truly captures your appreciation and sentiment, making your thank you
-                note even more meaningful.
-              </p>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative h-64 w-full overflow-hidden rounded-lg">
-                <img
-                  src="/placeholder.svg"
-                  alt="Feature 6"
-                  className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-500 hover:opacity-100">
-                  <PlayIcon className="h-12 w-12 text-white" />
-                </div>
-              </div>
-              <h3 className="mt-4 text-xl font-semibold">Thoughtful Packaging</h3>
-              <p className="mt-2 text-muted-foreground">
-                Your thank you note will be carefully packaged and presented in a way that adds to the overall
-                experience and makes it a true gift.
-              </p>
-            </div>
-          </div>
-        </section>
-        <section id="testimonials" className="bg-muted py-24">
-          <div className="container mx-auto grid grid-cols-1 gap-8 px-4 md:grid-cols-2 md:px-6">
-            <div className="flex flex-col items-center justify-center">
-              <blockquote className="relative rounded-lg bg-background p-8 shadow-lg">
-                <div className="absolute top-0 left-0 -translate-x-4 -translate-y-4">
-                  <QuoteIcon className="h-8 w-8 text-primary" />
-                </div>
-                <p className="text-muted-foreground">
-                  "The personalized thank you note I received from Thank You\n Notes was absolutely stunning. The
-                  attention to detail and\n thoughtful touches made it a truly special gift."
-                </p>
-                <div className="mt-4 flex items-center">
-                  <Avatar>
-                    <AvatarImage src="/placeholder-user.jpg" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <div className="ml-4">
-                    <div className="font-medium">John Doe</div>
-                    <div className="text-muted-foreground">CEO, Acme Inc.</div>
+        <section id="images" style={{ padding: '60px 20px' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: '2em', fontWeight: 'bold', textAlign: 'center', marginBottom: '40px' }}>Images</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '20px' }}>
+              {images.length > 0 ? (
+                images.map((image, index) => (
+                  <div key={index} style={{ position: 'relative', overflow: 'hidden', borderRadius: '10px', cursor: 'pointer' }} onClick={() => openImage(image)}>
+                    <img
+                      src={image}
+                      alt={`Memory ${index + 1}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease-in-out' }}
+                      className="hover:scale-105"
+                    />
+                    <div style={{ position: 'absolute', bottom: '0', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white', textAlign: 'center', padding: '5px', opacity: '0', transition: 'opacity 0.3s ease-in-out' }} className="hover:opacity-100">
+                      {`Memory ${index + 1}`}
+                    </div>
                   </div>
-                </div>
-              </blockquote>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <blockquote className="relative rounded-lg bg-background p-8 shadow-lg">
-                <div className="absolute top-0 left-0 -translate-x-4 -translate-y-4">
-                  <QuoteIcon className="h-8 w-8 text-primary" />
-                </div>
-                <p className="text-muted-foreground">
-                  "I was blown away by the quality and thoughtfulness of the\n thank you note I received from Thank You
-                  Notes. It's the\n perfect way to express my gratitude in a truly memorable way."
-                </p>
-                <div className="mt-4 flex items-center">
-                  <Avatar>
-                    <AvatarImage src="/placeholder-user.jpg" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <div className="ml-4">
-                    <div className="font-medium">Jane Doe</div>
-                    <div className="text-muted-foreground">Marketing Manager, Acme Inc.</div>
-                  </div>
-                </div>
-              </blockquote>
+                ))
+              ) : (
+                <p style={{ textAlign: 'center', color: '#d1d5db' }}>No memories available</p>
+              )}
             </div>
           </div>
         </section>
-       
+        <section id="videos" style={{ padding: '60px 20px', background: '#f0f0e1' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: '2em', fontWeight: 'bold', textAlign: 'center', marginBottom: '40px' }}>Videos</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
+              {videos.length > 0 ? (
+                videos.map((video, index) => (
+                  <div key={index} style={{ position: 'relative', overflow: 'hidden', borderRadius: '10px' }}>
+                    <video
+                      src={video}
+                      controls
+                      style={{ width: '100%', height: 'auto', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                ))
+              ) : (
+                <p style={{ textAlign: 'center', color: '#d1d5db' }}>No videos available</p>
+              )}
+            </div>
+          </div>
+        </section>
+        <section id="messages" style={{ padding: '60px 20px' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: '2em', fontWeight: 'bold', textAlign: 'center', marginBottom: '40px' }}>Messages</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
+              {webData.wishes.map((wish, index) => (
+                <div key={index} style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
+                  <p style={{ fontSize: '1.25em', color: '#3b3b3b' }}>{wish}</p>
+                  <p style={{ textAlign: 'right', fontSize: '1em', color: '#9b9b9b' }}>- {webData.senders[index]}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        <section id="kindness" style={{ padding: '60px 20px', background: '#e8e8d3' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: '2em', fontWeight: 'bold', textAlign: 'center', marginBottom: '40px' }}>Words of Kindness</h2>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <p style={{ fontSize: '1.25em', color: '#3b3b3b' }}>{webData.short_paragraph}</p>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: '1.25em', color: '#3b3b3b' }}>{webData.paragraph}</p>
+            </div>
+          </div>
+        </section>
       </main>
+      <footer style={{ textAlign: 'center', padding: '40px 20px', background: '#f5f5dc' }}>
+        <button onClick={toggleSurprise} style={{ backgroundColor: '#ff69b4', color: 'white', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+          {loading ? 'Generating...' : 'Click on me'}
+        </button>
+        <div style={{ marginTop: '20px', color: '#ff69b4', fontWeight: 'bold' }}>
+          {generatedMusic ? (
+            <audio controls>
+              <source src={generatedMusic} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          ) : (
+            "Generating music..."
+          )}
+        </div>
+      </footer>
+      {selectedImage && (
+        <div style={{ position: 'fixed', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1000' }} onClick={closeImage}>
+          <img src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
+        </div>
+      )}
     </div>
-
-  )
-}
-
-function CheckIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  )
-}
-
-
-function ChevronDownIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  )
-}
-
+  );
+};
 
 function GiftIcon(props) {
   return (
@@ -337,69 +256,7 @@ function GiftIcon(props) {
       <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
       <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5" />
     </svg>
-  )
-}
-
-
-function PlayIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polygon points="6 3 20 12 6 21 6 3" />
-    </svg>
-  )
-}
-
-
-function QuoteIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
-      <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
-    </svg>
-  )
-}
-
-
-function XIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  )
+  );
 }
 
 export default ThankYou;

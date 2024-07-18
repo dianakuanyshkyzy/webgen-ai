@@ -23,7 +23,7 @@ async function askGpt(prompt: any) {
       type: 'json_object',
     },
     max_tokens: 1024,
-    temperature: 0.8,
+    temperature: 1,
   });
   return response.choices[0].message.content;
 }

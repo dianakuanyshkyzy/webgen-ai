@@ -134,12 +134,14 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
             </div>
             <div>
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-                Happy Birthday, Emma!
+                {webData.title}!
               </h1>
             </div>
           </div>
           <div className="flex flex-col items-center justify-center space-y-4">
-            <img src={images[0]} width={400} height={400} alt="Birthday Cake" className="max-w-full" />
+          <img src={images[0]} width={600} height={600} alt="Birthday Cake" className="max-w-full rounded-lg"/>
+
+            {/* replace with generated image */}
           </div>
         </div>
       </header>
@@ -157,101 +159,93 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
           <div className="flex flex-col items-center justify-center space-y-4">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">A Message for You</h2>
             <p className="max-w-md text-center text-muted-foreground">
-              Emma, my dear little sister, I can't believe you're already 6 years old! Time has flown by so quickly,
-              but the memories we've created together will last a lifetime. You've grown into such an amazing, kind, and
-              intelligent young girl, and I'm so proud of you. I hope your birthday is filled with joy, laughter, and
-              all the things that make you happy. I love you more than words can express, and I can't wait to see what
-              the future holds for you. Happy birthday, sis!
+              {webData.paragraph}
             </p>
           </div>
 
           <Card className="w-full bg-pink-100">
             <CardHeader>
-              <CardTitle>Emma's Birthday Quotes</CardTitle>
-              <CardDescription>Inspiring and heartfelt quotes to celebrate Emma's special day.</CardDescription>
+              <CardTitle>Birthday wishes for {webData.recipient}</CardTitle>
+              <CardDescription>Inspiring and heartfelt wishes to celebrate {webData.recipient}'s special day.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-6">
-              <blockquote className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <QuoteIcon className="h-5 w-5 text-primary" />
-                  <span>Emma, may your birthday be as bright and beautiful as you are.</span>
-                </div>
-                <div className="text-sm text-muted-foreground">- Your Loving Family</div>
-              </blockquote>
-              <blockquote className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <QuoteIcon className="h-5 w-5 text-primary" />
-                  <span>Wishing you a day as special as you are, Emma. Happy birthday!</span>
-                </div>
-                <div className="text-sm text-muted-foreground">- Your Best Friends</div>
-              </blockquote>
-              <blockquote className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <QuoteIcon className="h-5 w-5 text-primary" />
-                  <span>Emma, may your birthday be filled with laughter, love, and all your heart's desires.</span>
-                </div>
-                <div className="text-sm text-muted-foreground">- Your Adoring Grandparents</div>
-              </blockquote>
-            </CardContent>
+            <Card className="w-full bg-pink-100">
+  <CardContent className="grid gap-6">
+    {webData.wishes.map((wish, index) => (
+      <blockquote key={index} className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <QuoteIcon className="h-5 w-5 text-primary" />
+          <span>{wish}</span>
+        </div>
+      </blockquote>
+    ))}
+  </CardContent>
+</Card>
+
           </Card>
 
           <Card className="w-full bg-blue-100 text-blue-900">
-            <CardHeader>
-              <CardTitle>Fun Facts About Emma</CardTitle>
-              <CardDescription>Get to know your little sister a little better!</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-6">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-blue-100">
-                  <CakeIcon className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="font-medium">Favorite Dessert</div>
-                  <div className="text-sm text-blue-900/80">Chocolate Cake</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-blue-100">
-                  <FlowerIcon className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="font-medium">Favorite Flower</div>
-                  <div className="text-sm text-blue-900/80">Sunflowers</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-blue-100">
-                  <PaletteIcon className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="font-medium">Favorite Color</div>
-                  <div className="text-sm text-blue-900/80">Purple</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-blue-100">
-                  <PawPrintIcon className="h-6 w-6" />
-                </div>
-                <div>
-                  <div className="font-medium">Favorite Animal</div>
-                  <div className="text-sm text-blue-900/80">Puppies</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+  <CardHeader>
+    <CardTitle>Fun Facts About Emma</CardTitle>
+    <CardDescription>Get to know your little sister a little better!</CardDescription>
+  </CardHeader>
+  <CardContent className="grid gap-6">
+    {webData.facts.map((fact, index) => (
+      <div key={index} className="flex items-center gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-blue-100">
+          {/* You can dynamically switch icons here based on the fact type */}
+          {index === 0 && <CakeIcon className="h-6 w-6" />}
+          {index === 1 && <FlowerIcon className="h-6 w-6" />}
+          {index === 2 && <PaletteIcon className="h-6 w-6" />}
+          {index === 3 && <PawPrintIcon className="h-6 w-6" />}
+        </div>
+        <div>
+          <div className="font-medium">{fact}</div>
+          <div className="text-sm text-blue-900/80">{fact.description}</div>
+        </div>
+      </div>
+    ))}
+  </CardContent>
+</Card>
+
         </div>
       </section>
+      <section className="py-16 bg-purple-100">
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 className="mb-8 text-3xl font-bold text-blue-900">Memorable Videos</h2>
+    <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      {videos.map((video, index) => (
+        <div key={index} className="flex flex-col items-center w-full bg-white rounded-lg shadow-lg">
+          <video
+            className="w-full rounded-t-lg"
+            controls
+          >
+            <source src={video} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div className="p-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Special Moment {index + 1}
+            </h3>
+            <p className="text-sm text-gray-600">
+              A cherished memory from our wonderful journey together.
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
 
       <section id="surprise" className="py-16 bg-yellow-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="mb-8 text-3xl font-bold text-yellow-900">A Special Surprise</h2>
           <div className="rounded-lg bg-yellow-200 p-6 shadow-lg">
-            <h3 className="mb-4 text-xl font-bold text-yellow-900">An Adventure Day</h3>
+            <h3 className="mb-4 text-xl font-bold text-yellow-900">Open to see a special surpise! </h3>
             <p className="mb-4 text-yellow-800">
-              As a special birthday surprise, I've planned an exciting adventure day for us! We'll start with a visit to your favorite amusement park, followed by a picnic in the park. In the afternoon, we'll go to a fun art class where we can create beautiful paintings together. It's going to be a day full of laughter and joy!
+               
             </p>
             <Button href="#" className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400">
-              Discover More
+              Click me! 
             </Button>
           </div>
         </div>
