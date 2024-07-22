@@ -131,7 +131,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
 
         const data = await response.json();
         if (response.ok) {
-          setAudio(data[0].audio_url);
+          setAudio(data.s3Url);
         } else {
           console.error("Error:", data.error);
         }
@@ -231,8 +231,8 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
             <CardHeader>
               <CardTitle>Birthday wishes for {webData.recipient}</CardTitle>
               <CardDescription>
-                Inspiring and heartfelt wishes to celebrate {webData.recipient}'s
-                special day.
+                Inspiring and heartfelt wishes to celebrate {webData.recipient}
+                's special day.
               </CardDescription>
             </CardHeader>
             <Card className="w-full bg-pink-100">
@@ -251,9 +251,9 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
 
           <Card className="w-full bg-blue-100 text-blue-900">
             <CardHeader>
-              <CardTitle>Fun Facts About {webData.recipient}</CardTitle>
+              <CardTitle>Fun Facts About Emma</CardTitle>
               <CardDescription>
-                You are ...
+                Get to know your little sister a little better!
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
