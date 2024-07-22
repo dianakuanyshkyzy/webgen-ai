@@ -218,14 +218,12 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
           {loading ? 'Generating...' : 'Click on me'}
         </button>
         <div style={{ marginTop: '20px', color: '#ff69b4', fontWeight: 'bold' }}>
-          {generatedMusic ? (
+          {/* {generatedMusic ? ( */}
             <audio controls>
               <source src={generatedMusic} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
-          ) : (
-            "Generating music..."
-          )}
+          {/* )  */}
         </div>
       </footer>
       {selectedImage && (

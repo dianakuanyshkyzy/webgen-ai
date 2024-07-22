@@ -1,4 +1,3 @@
-//
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -70,12 +69,12 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
     setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      handleNextWish();
-    }, 5000);
-    return () => clearInterval(interval); // Cleanup the interval on component unmount
-  }, [webData.wishes.length]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     handleNextWish();
+  //   }, 5000);
+  //   return () => clearInterval(interval); // Cleanup the interval on component unmount
+  // }, [webData?.wishes.length]);
 
   if (!webData) {
     return <div>Loading...</div>; // Adjust this to your preferred loading state

@@ -98,7 +98,6 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             Contact
           </Link>
         </nav>
-        <Button size="sm">RSVP</Button>
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
@@ -106,13 +105,12 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             <div className="space-y-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Join us for a Celebration</h2>
               <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                You're invited to a special event where we'll come together to celebrate life, love, and the moments
-                that matter most.
+                {webData.about}
               </p>
               <div className="flex gap-4">
                 <div className="grid gap-1">
                   <h3 className="text-xl font-bold">Date</h3>
-                  <p className="text-muted-foreground">June 10, 2023</p>
+                  <p className="text-muted-foreground">{webData.eventDate}</p>
                 </div>
                 <div className="grid gap-1">
                   <h3 className="text-xl font-bold">Time</h3>
@@ -126,7 +124,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             </div>
             <div className="relative group">
               <img
-                src="/placeholder.svg"
+                src={images[0] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Event"
@@ -134,17 +132,18 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               />
               <div className="absolute inset-0 bg-background/50 opacity-0 transition-opacity group-hover:opacity-100 flex items-center justify-center">
                 <p className="text-muted-foreground text-center px-4">
-                  Join us for a night of celebration, laughter, and making memories that will last a lifetime.
+                  {webData.short_paragraph}
                 </p>
               </div>
             </div>
           </div>
         </section>
+
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
               <img
-                src="/placeholder.svg"
+                src={images[1] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Sender"
@@ -159,8 +158,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             <div className="space-y-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">A Message from the Host</h2>
               <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                I'm thrilled to invite you to this special celebration. This event holds a dear place in my heart, and I
-                can't wait to share it with you. Let's come together and create memories that will last a lifetime.
+                {webData.paragraph}
               </p>
               <Link href="#" className="inline-flex items-center gap-2 text-primary hover:underline" prefetch={false}>
                 Learn More
@@ -174,13 +172,12 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             <div className="space-y-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Celebrate with Us</h2>
               <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                This event is a chance for us to come together and celebrate the moments that matter most. Whether it's
-                a birthday, wedding, or any other special occasion, we're excited to share this experience with you.
+                {webData.poemabout}
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative group">
                   <img
-                    src="/placeholder.svg"
+                    src={images[2] || "/placeholder.svg"}
                     width="260"
                     height="260"
                     alt="Celebration"
@@ -194,7 +191,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                 </div>
                 <div className="relative group">
                   <img
-                    src="/placeholder.svg"
+                    src={images[3] || "/placeholder.svg"}
                     width="260"
                     height="260"
                     alt="Celebration"
@@ -210,7 +207,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             </div>
             <div className="relative group">
               <img
-                src="/placeholder.svg"
+                src={images[4] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Celebration"
@@ -229,7 +226,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
               <img
-                src="/placeholder.svg"
+                src={images[5] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Memories"
@@ -250,7 +247,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative group">
                   <img
-                    src="/placeholder.svg"
+                    src={images[6] || "/placeholder.svg"}
                     width="260"
                     height="260"
                     alt="Memories"
@@ -265,7 +262,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                 </div>
                 <div className="relative group">
                   <img
-                    src="/placeholder.svg"
+                    src={images[7] || "/placeholder.svg"}
                     width="260"
                     height="260"
                     alt="Memories"
@@ -281,42 +278,11 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             </div>
           </div>
         </section>
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
-          <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                RSVP and Join the Celebration
-              </h2>
-              <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                We can't wait to have you join us for this special event. Please RSVP to let us know you'll be there,
-                and feel free to reach out if you have any questions or special requests.
-              </p>
-              <div className="flex gap-4">
-                <Button>RSVP Now</Button>
-                <Button variant="outline">Contact Us</Button>
-              </div>
-            </div>
-            <div className="relative group">
-              <img
-                src="/placeholder.svg"
-                width="550"
-                height="550"
-                alt="RSVP"
-                className="mx-auto aspect-square overflow-hidden rounded-xl object-cover sm:w-full"
-              />
-              <div className="absolute inset-0 bg-background/50 opacity-0 transition-opacity group-hover:opacity-100 flex items-center justify-center">
-                <p className="text-muted-foreground text-center px-4">
-                  Don't miss out on this special celebration. RSVP now to secure your spot and be a part of the magic.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
               <img
-                src="/placeholder.svg"
+                src={images[8] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Surprise"
