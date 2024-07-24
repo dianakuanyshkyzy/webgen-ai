@@ -3,12 +3,8 @@
 import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Label } from '@radix-ui/react-dropdown-menu';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import S3UploadForm from '@/components/S3UploadForm';
-import styles from '@/styles/Home.module.css';
 
 export default function Component() {
   const [message, setMessage] = useState('');
@@ -37,9 +33,40 @@ export default function Component() {
       setId(result.id);
       setGeneratedUrl(result.url);
 
+      // Generate audio after generating the website
+      await generateAudio(result.id, message);
+
     } catch (error: any) {
       console.error('Error:', error);
       setGeneratedUrl(`Error: ${error.message}`);
+    }
+  };
+
+  const generateAudio = async (id, message) => {
+    try {
+      const apiResponse = await fetch('/api/generate-songs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: message,
+          make_instrumental: false,
+          wait_audio: true,
+          id,
+        }),
+      });
+
+      if (!apiResponse.ok) {
+        const errorData = await apiResponse.json();
+        console.error('Error generating audio:', errorData.error);
+        throw new Error(errorData.error);
+      }
+
+      const data = await apiResponse.json();
+      console.log('Audio generated and uploaded to S3:', data.s3Url);
+    } catch (error) {
+      console.error('Error generating audio:', error.message);
     }
   };
 
@@ -126,46 +153,5 @@ export default function Component() {
         )}
       </div>
     </div>
-  );
-}
-
-function UploadIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-      <polyline points="17 8 12 3 7 8" />
-      <line x1="12" x2="12" y1="3" y2="15" />
-    </svg>
-  );
-}
-
-function XIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
   );
 }

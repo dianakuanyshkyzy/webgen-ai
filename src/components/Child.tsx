@@ -28,6 +28,16 @@ import {
 import confetti from "canvas-confetti";
 import { useSpring, animated } from "@react-spring/web";
 import React, { useState, useEffect } from "react";
+import { S3Client, ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+const s3Client = new S3Client({
+  region: process.env.NEXT_PUBLIC_AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 function AnimatedImage({ src, index, total }) {
   const angle = (index / total) * 2 * Math.PI;
@@ -87,61 +97,63 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
   const [currentWish, setCurrentWish] = useState(0);
 
   useEffect(() => {
-    const fetchMedia = async () => {
+    const fetchImages = async () => {
       try {
         const imageResponse = await fetch(`/api/s3-images?id=${id}`);
-        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
 
         if (!imageResponse.ok) {
           throw new Error("Failed to fetch images");
         }
+
+        const imageData = await imageResponse.json();
+        setImages(imageData.images || []);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+
+    const fetchVideos = async () => {
+      try {
+        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
+
         if (!videoResponse.ok) {
           throw new Error("Failed to fetch videos");
         }
 
-        const imageData = await imageResponse.json();
         const videoData = await videoResponse.json();
-
-        setImages(imageData.images || []);
         setVideos(videoData.videos || []);
       } catch (error) {
-        console.error("Error fetching media:", error);
+        console.error("Error fetching videos:", error);
       }
     };
+
+  
+
+    // const fetchAudio = async () => {
+    //   try {
+    //     const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+
+    //     if (!audioResponse.ok) {
+    //       throw new Error("Failed to fetch audios");
+    //     }
+
+    //     const audioData = await audioResponse.json();
+    //     if (audioData.audio && audioData.audio.length > 0) {
+    //       setAudio(audioData.audio[0]);
+    //     } else {
+    //       setAudio(null);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching audios:", error);
+    //   }
+    // };
 
     if (id) {
-      fetchMedia();
+      // fetchAudio(); 
+      fetchImages();
+      fetchVideos();
     }
   }, [id]);
-
-  useEffect(() => {
-    const generateAudio = async () => {
-      try {
-        const response = await fetch("/api/generate-songs", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt: webData.recipient,
-            make_instrumental: false,
-            wait_audio: true,
-          }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          setAudio(data.s3Url);
-        } else {
-          console.error("Error:", data.error);
-        }
-      } catch (error) {
-        console.error("Error generating music:", error.message);
-      }
-    };
-
-    generateAudio();
-  }, [webData.recipient]);
 
   const handleNextWish = () => {
     setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
@@ -168,6 +180,41 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
       spread: 200,
       origin: { y: 0.6 },
     });
+  };
+
+  const handleSurpriseClick = async () => {
+    try {
+      // Check if audio already exists in S3
+      const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+
+      if (audioResponse.ok) {
+        const audioData = await audioResponse.json();
+        setAudio(audioData.audio[0] || null);
+      } else {
+        // Generate audio if it doesn't exist
+        const generateResponse = await fetch("/api/generate-songs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: webData.recipient,
+            make_instrumental: false,
+            wait_audio: true,
+          }),
+        });
+
+        if (generateResponse.ok) {
+          const data = await generateResponse.json();
+          setAudio(data.audio_url);
+        } else {
+          const errorData = await generateResponse.json();
+          console.error("Error generating audio:", errorData.error);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching or generating audio:", error);
+    }
   };
 
   return (
@@ -231,8 +278,8 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
             <CardHeader>
               <CardTitle>Birthday wishes for {webData.recipient}</CardTitle>
               <CardDescription>
-                Inspiring and heartfelt wishes to celebrate {webData.recipient}
-                's special day.
+                Inspiring and heartfelt wishes to celebrate {webData.recipient}'s
+                special day.
               </CardDescription>
             </CardHeader>
             <Card className="w-full bg-pink-100">
@@ -251,9 +298,9 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
 
           <Card className="w-full bg-blue-100 text-blue-900">
             <CardHeader>
-              <CardTitle>Fun Facts About Emma</CardTitle>
+              <CardTitle>Fun Facts About {webData.recipient}</CardTitle>
               <CardDescription>
-                Get to know your little sister a little better!
+                You are ...
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
@@ -320,6 +367,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
             <Button
               href="#"
               className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
+              onClick={handleSurpriseClick}
             >
               Click me!
             </Button>

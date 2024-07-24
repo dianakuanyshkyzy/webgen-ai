@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       "You are the best mom in the world - from your daughter",
       "You are my everything - from your son",
     ],
-    "eventDate": "2024-12-31T00:00:00", // identify the date of the event 
+    "eventDate": "2024-12-31", // identify the date of the event 
     "facts": [
       "Your eyes lighten when you see an ice cream",
       "Every time you see a dog, you smile",
@@ -51,6 +51,7 @@ export async function POST(request: Request) {
                 May our journey continue, hand in hand,
                 Forever united, a steadfast stand.
                 Happy anniversary, my love, my friend", //create a poem about the person you are writing the gift card for. Include the reason of the celebration.
+    "description": "mom, turning 40, gardening, cooking, birthday, dogs, ..." //a short description in under 150 characters. Will be used to generate a song based on this JSON category. also include the style of the song based on the user prompt - be super creative! 
   }
 
 }  Generate a JSON file. 

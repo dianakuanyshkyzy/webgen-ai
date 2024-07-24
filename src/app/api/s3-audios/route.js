@@ -21,7 +21,7 @@ export async function GET(req) {
 
     const params = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Prefix: `${id}/audio/`
+      Prefix: `${id}/audios/`
     };
 
     const command = new ListObjectsV2Command(params);

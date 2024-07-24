@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-const SUNOAI_API_URL = 'https://api5.sunoapi.software/api/generate';
+const SUNOAI_API_URL = 'https://api2.sunoapi.software/api/generate';
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -31,7 +31,7 @@ async function uploadToS3(buffer, key) {
 }
 
 export async function POST(req) {
-  const { prompt, make_instrumental, wait_audio } = await req.json();
+  const { prompt, make_instrumental, wait_audio, id } = await req.json();
 
   try {
     const response = await axios.post(SUNOAI_API_URL, {
@@ -48,7 +48,7 @@ export async function POST(req) {
       console.error('Error response from Suno AI:', response.data);
       throw new Error('Failed to generate music');
     }
-    
+
     const audioUrl = response.data[0].audio_url;
 
     // Download the audio from the generated URL
@@ -56,7 +56,7 @@ export async function POST(req) {
     const audioBuffer = Buffer.from(audioResponse.data, 'binary');
 
     // Upload the audio to S3
-    const s3Key = `audio/${response.data[0].id}.mp3`;
+    const s3Key = `${id}/audios/${response.data[0].id}.mp3`;
     const s3Url = await uploadToS3(audioBuffer, s3Key);
 
     return NextResponse.json({ s3Url });
