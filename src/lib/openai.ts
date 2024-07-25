@@ -7,7 +7,7 @@ const openai = new OpenAI({
 
 async function askGpt(prompt: any) {
   const response = await openai.chat.completions.create({
-    model: 'gpt-4',
+    model: 'gpt-4o',
     messages: [
       {
         role: 'system',
@@ -20,8 +20,8 @@ async function askGpt(prompt: any) {
       },
     ],
     response_format: {
-      type: 'json_object',
-    },
+       type: 'json_object',
+     },
     max_tokens: 1024,
     temperature: 1,
   });
