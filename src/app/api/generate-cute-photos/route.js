@@ -19,7 +19,7 @@ const openai = new OpenAI({
 // Function to sanitize descriptions
 const sanitizeDescription = (description) => {
   // Basic sanitization: remove special characters and limit length
-  return description.replace(/[^a-zA-Z0-9\s]/g, '').substring(0, 100);
+  return description.replace(/[^a-zA-Z0-9\s]/g, '');
 };
 
 export async function POST(req) {
@@ -30,6 +30,7 @@ export async function POST(req) {
 
     for (const description of descriptions) {
       const sanitizedDescription = sanitizeDescription(description);
+      console.log(`Generating image for description: ${sanitizedDescription}`);
 
       const response = await openai.images.generate({
         model: "dall-e-3",
@@ -40,6 +41,7 @@ export async function POST(req) {
 
       if (response.data && response.data[0] && response.data[0].url) {
         const imageUrl = response.data[0].url;
+        console.log(`Image URL: ${imageUrl}`);
         const imageResponse = await fetch(imageUrl);
         const imageBuffer = await imageResponse.buffer();
 
@@ -57,6 +59,7 @@ export async function POST(req) {
       }
     }
 
+    console.log('Generated images:', generatedImages);
     return NextResponse.json({ generatedImages });
   } catch (error) {
     console.error("Error generating cute photos:", error);
