@@ -11,6 +11,7 @@ export default function Component() {
   const [generatedUrl, setGeneratedUrl] = useState('');
   const [id, setId] = useState('');
   const [imagesUploaded, setImagesUploaded] = useState(false);
+  const [description, setDescription] = useState('');
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -34,7 +35,20 @@ export default function Component() {
       setGeneratedUrl(result.url);
 
       // Generate audio after generating the website
-      await generateAudio(result.id, message);
+
+
+
+
+
+
+      //await generateAudio(result.id, message);
+
+
+
+
+
+
+
 
     } catch (error: any) {
       console.error('Error:', error);
@@ -70,9 +84,58 @@ export default function Component() {
     }
   };
 
-  const handleUploadSuccess = (file) => {
+  const handleUploadSuccess = async (file) => {
     console.log('Uploaded file:', file);
-    setImagesUploaded(true);
+
+    try {
+      // Generate description
+      const response = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error generating description:', errorData.error);
+        throw new Error(errorData.error);
+      }
+
+      const data = await response.json();
+      setDescription(data.descriptions[0]);
+
+      // Generate images based on description
+      await generateImages(id, data.descriptions[0]);
+
+      setImagesUploaded(true);
+    } catch (error) {
+      console.error('Error generating description and images:', error.message);
+    }
+  };
+
+  const generateImages = async (id, description) => {
+    try {
+      const response = await fetch('/api/generate-cute-photos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ descriptions: [description], id }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error generating images:', errorData.error);
+        throw new Error(errorData.error);
+      }
+
+      const data = await response.json();
+      console.log('Images generated and uploaded to S3:', data.generatedImages);
+    } catch (error) {
+      console.error('Error generating images:', error.message);
+    }
   };
 
   return (
@@ -155,3 +218,73 @@ export default function Component() {
     </div>
   );
 }
+
+
+
+
+
+
+// /**
+//  * v0 by Vercel.
+//  * @see https://v0.dev/t/B1sBwvjQh84
+//  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
+//  */
+// import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+// import { Button } from "@/components/ui/button"
+
+// export default function Component() {
+//   return (
+//     <Card>
+//       <CardHeader>
+//         <CardTitle>Upload Images</CardTitle>
+//         <CardDescription>Drag and drop your images or click the button below to select files.</CardDescription>
+//       </CardHeader>
+//       <CardContent className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-lg p-10 space-y-6">
+//         <CloudUploadIcon className="w-16 h-16 text-zinc-500 dark:text-zinc-400" />
+//         <Button variant="outline">Select Files</Button>
+//       </CardContent>
+//     </Card>
+//   )
+// }
+
+// function CloudUploadIcon(props) {
+//   return (
+//     <svg
+//       {...props}
+//       xmlns="http://www.w3.org/2000/svg"
+//       width="24"
+//       height="24"
+//       viewBox="0 0 24 24"
+//       fill="none"
+//       stroke="currentColor"
+//       strokeWidth="2"
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//     >
+//       <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+//       <path d="M12 12v9" />
+//       <path d="m16 16-4-4-4 4" />
+//     </svg>
+//   )
+// }
+
+
+// function XIcon(props) {
+//   return (
+//     <svg
+//       {...props}
+//       xmlns="http://www.w3.org/2000/svg"
+//       width="24"
+//       height="24"
+//       viewBox="0 0 24 24"
+//       fill="none"
+//       stroke="currentColor"
+//       strokeWidth="2"
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//     >
+//       <path d="M18 6 6 18" />
+//       <path d="m6 6 12 12" />
+//     </svg>
+//   )
+// }

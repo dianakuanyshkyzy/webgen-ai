@@ -18,18 +18,31 @@ const openai = new OpenAI({
 
 // Function to sanitize descriptions
 const sanitizeDescription = (description) => {
-  // Basic sanitization: remove special characters and limit length
-  return description.replace(/[^a-zA-Z0-9\s]/g, '');
+  const sanitizedDescription = description.replace(/[^a-zA-Z0-9\s]/g, '').trim();
+  return `${sanitizedDescription}. Create an image in a cartoon style.`;
 };
 
 export async function POST(req) {
   try {
+    const scenarios = [
+      "holding a bouquet of vibrant flowers, standing in a garden filled with colorful blooms",
+      "playing with a cute puppy in a sunny backyard",
+      "sitting under a tree, reading an interesting book with a serene expression",
+      "flying a kite in a spacious park on a breezy day",
+      "drawing with colorful chalk on a sidewalk, creating a beautiful mural",
+      "building an intricate sandcastle on a beach, surrounded by gentle waves",
+      "exploring a magical forest, looking up at the tall trees with wonder",
+      "riding a bicycle down a tree-lined street, smiling with joy",
+      "playing in the snow, building a snowman with a carrot nose and coal eyes",
+      "sitting on a park bench, enjoying a delicious ice cream cone on a sunny day"
+    ];
     const { descriptions, id } = await req.json();
-
+    
     const generatedImages = [];
-
+    for(const scenario of scenarios){
     for (const description of descriptions) {
-      const sanitizedDescription = sanitizeDescription(description);
+      const descriptionfull = `${scenario} ${description}`;
+      const sanitizedDescription = sanitizeDescription(descriptionfull);
       console.log(`Generating image for description: ${sanitizedDescription}`);
 
       const response = await openai.images.generate({
@@ -57,7 +70,7 @@ export async function POST(req) {
       } else {
         throw new Error("Failed to generate image");
       }
-    }
+    } }
 
     console.log('Generated images:', generatedImages);
     return NextResponse.json({ generatedImages });
