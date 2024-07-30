@@ -2,6 +2,7 @@ import party from 'party-js';
 import React, { useState, useEffect } from 'react';
 
 interface WishData {
+  webData:{
   title: string;
   recipient: string;
   about: string;
@@ -14,6 +15,7 @@ interface WishData {
   characteristics: string[];
   short_paragraph: string;
   senders: string;
+}
 }
 
 interface MomHomePageProps {

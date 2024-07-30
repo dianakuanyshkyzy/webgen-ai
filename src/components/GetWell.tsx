@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import {Button} from './ui/button';
 interface WishData {
+  webData: {
   title: string;
   recipient: string;
   about: string;
@@ -18,6 +19,7 @@ interface WishData {
   gender: string;
   componentType: string;
   poemabout: string;
+}
 }
 
 interface GetWellProps {
@@ -235,7 +237,7 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
         </section>
         <footer style={{ textAlign: 'center', marginTop: '20px' }}>
         <Button
-              href="#"
+              
               className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
               onClick={handleSurpriseClick}
             >

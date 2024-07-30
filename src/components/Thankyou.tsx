@@ -5,21 +5,27 @@ import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from 'react';
 
 interface WishData {
-  title: string;
-  recipient: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string[];
-  gender: string;
-  componentType: string;
-  poemabout: string;
+  webData: {
+    title: string;
+    about: string;
+    paragraph: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    short_paragraph: string;
+    characteristics: string[];
+    facts: string[];
+    senders: string;
+    componentType: string;
+    poemabout: string;
+    gender: string;
+    description: string;
+    recipient: string;
+    eventDate: string;
+  
+}
 }
 
 interface ThankyouProps {
@@ -107,14 +113,7 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
 
-  const throwConfetti = () => {
-    confetti({
-      particleCount: 400,
-      spread: 200,
-      origin: { y: 0.6 },
-    });
-  };
-
+  
   const handleSurpriseClick = async () => {
     try {
       setLoading(true);
@@ -279,7 +278,7 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
   );
 };
 
-function GiftIcon(props) {
+function GiftIcon(props:React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

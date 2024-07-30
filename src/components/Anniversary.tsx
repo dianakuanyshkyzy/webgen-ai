@@ -3,6 +3,7 @@ import { useSpring, animated } from 'react-spring';
 import Countdown from './ui/countdown';
 
 interface WishData {
+  webData:{
   title: string;
   recipient: string;
   eventDate: string;
@@ -19,6 +20,7 @@ interface WishData {
   gender: string;
   componentType: string;
   poemabout: string;
+}
 }
 
 interface AnniversaryProps {
@@ -280,7 +282,6 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
               <div key={index} className="flex gap-5 max-md:flex-col max-md:gap-0">
                 <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
                   <video
-                    loading="lazy"
                     src={video}
                     controls
                     className="grow w-full aspect-[1.82] max-md:max-w-full rounded-xl"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 interface WishData {
+  webData:{
   title: string;
   recipient: string;
   about: string;
@@ -13,6 +14,7 @@ interface WishData {
   characteristics: string[];
   short_paragraph: string;
   senders: string;
+  }
 }
 
 interface DadHomePageProps {
@@ -153,7 +155,7 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
         <h2 className="text-3xl">About {webData.recipient}</h2>
         <p className="my-4">{webData.about}</p>
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {webData.hobbies?.map((hobby, index) => (
+          {webData.hobbies?.map((hobby:string, index:number) => (
             <div className="card bg-white border border-orange-100 rounded-lg p-4" key={index}>
               <div className="icon">⭐</div>
               <h3 className="text-xl">{hobby}</h3>
@@ -187,7 +189,7 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
       </section>
       <section id="poems" className="poems py-8 text-center">
         <h2 className="text-3xl">Personalized Quotes</h2>
-        {webData.quotes?.map((quote, index) => (
+        {webData.quotes?.map((quote: string, index: number) => (
           <div className="poem bg-white border border-orange-100 rounded-lg p-4 my-4" key={index}>
             <div className="content">
               <p>{quote}</p>
@@ -197,7 +199,7 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
       </section>
       <section id="wishes" className="wishes py-8 text-center">
         <h2 className="text-3xl">Wishes</h2>
-        {webData.wishes?.map((wish, index) => (
+        {webData.wishes?.map((wish:string, index:number) => (
           <div className="wish-item bg-white border border-orange-100 rounded-lg p-4 my-4" key={index}>
             <p>{wish}</p>
           </div>
@@ -213,7 +215,7 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
           </div>
         </div>
         <Button
-              href="#"
+             
               className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
               onClick={handleSurpriseClick}
             >

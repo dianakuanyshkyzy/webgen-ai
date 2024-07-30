@@ -25,21 +25,19 @@ const sanitizeDescription = (description) => {
 export async function POST(req) {
   try {
     const scenarios = [
-      "holding a bouquet of vibrant flowers, standing in a garden filled with colorful blooms. The person is standing at a distance from the camera, with the garden scene spread out in the background",
-      "playing with a cute puppy in a sunny backyard, looking at this puppy. The person is sitting sideways on the grass, with the puppy wagging its tail and looking up at the person with big, adorable eyes. The scene is captured from a distance, showing the entire backyard",
-      "sitting under a tree, reading an interesting book with a serene expression. The person is seated at a distance from the camera, with the tree and surrounding park area visible in the background",
-      "exploring a magical forest, looking up at the tall trees with wonder. The person is at some distance from the camera, surrounded by the mystical forest setting",
-      "riding a bicycle down a tree-lined street, smiling with joy. The scene is viewed from a distance, capturing the entire street and the person on the bicycle",
-      "playing in the snow, building a snowman with a carrot nose and coal eyes. The person is at a distance from the camera, showing the snowman and the snowy landscape around them",
-      "sitting on a park bench, enjoying a delicious ice cream cone on a sunny day. The person is at some distance from the camera, with the park setting clearly visible in the background"
+      "holding a bouquet of vibrant flowers, standing in a garden filled with colorful blooms",
+      "playing with a cute puppy in a sunny backyard",
+      "sitting under a tree, reading an interesting book with a serene expression",
+      "building an intricate sandcastle on a beach, surrounded by gentle waves",
+      "riding a bicycle down a tree-lined street, smiling with joy",
+      "sitting on a park bench, enjoying a delicious ice cream cone on a sunny day"
     ];
-    
     const { descriptions, id } = await req.json();
     
     const generatedImages = [];
     for(const scenario of scenarios){
     for (const description of descriptions) {
-      const descriptionfull = `The character is ${scenario}. ${description}`;
+      const descriptionfull = `${scenario} ${description}`;
       const sanitizedDescription = sanitizeDescription(descriptionfull);
       console.log(`Generating image for description: ${sanitizedDescription}`);
 

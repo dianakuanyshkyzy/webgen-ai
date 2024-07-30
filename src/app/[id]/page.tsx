@@ -13,6 +13,7 @@ import GetWell from '@/components/GetWell';
 import Invitation from '@/components/Invitation';
 import Graduation from '@/components/Graduation';
 interface WishData {
+  webData:{
   title: string;
   about: string;
   paragraph: string;
@@ -27,6 +28,11 @@ interface WishData {
   senders: string;
   componentType: string;
   poemabout: string;
+  gender: string;
+  description: string;
+  recipient: string;
+  eventDate: string;
+}
 }
 
 const GiftCardPage: React.FC = () => {
@@ -54,25 +60,24 @@ const GiftCardPage: React.FC = () => {
       
       {wishJsonData ? (
         <>
-          {wishJsonData.wishData.webData?.componentType === 'girl' ? (
+          {wishJsonData.wishData?.webData?.componentType === 'girl' ? (
             <Girlfriend wishData={wishJsonData.wishData} id={id} />
-          ) : wishJsonData.wishData.webData?.componentType === 'boy' ? (
+          ) : wishJsonData.wishData?.webData?.componentType === 'boy' ? (
             <Boyfriend wishData={wishJsonData.wishData} id={id} />
-          ) : wishJsonData.wishData.webData?.componentType === 'child' ? (
+          ) : wishJsonData.wishData?.webData?.componentType === 'child' ? (
             <Child wishData={wishJsonData.wishData} id={id} />
-          ): wishJsonData.wishData.webData?.componentType === 'anniversary' ? (
+          ): wishJsonData.wishData?.webData?.componentType === 'anniversary' ? (
             <Anniversary wishData={wishJsonData.wishData} id={id} />
-          ):
-          wishJsonData.wishData.webData?.componentType === 'thank_you' ? (
+          ):wishJsonData.wishData?.webData?.componentType === 'thank_you' ? (
             <ThankYou wishData={wishJsonData.wishData} id={id} />
           ):
-          wishJsonData.wishData.webData?.componentType === 'get_well' ? (
+          wishJsonData.wishData?.webData?.componentType === 'get_well' ? (
             <GetWell wishData={wishJsonData.wishData} id={id} />
           ):
-          wishJsonData.wishData.webData?.componentType === 'invitation' ? (
+          wishJsonData.wishData?.webData?.componentType === 'invitation' ? (
             <Invitation wishData={wishJsonData.wishData} id={id} />
           ):
-          wishJsonData.wishData.webData?.componentType === 'graduation' ? (
+          wishJsonData.wishData?.webData?.componentType === 'graduation' ? (
             <Graduation wishData={wishJsonData.wishData} id={id} />
           ):
            null}

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 
 interface WishData {
+  webData:{
   title: string;
   recipient: string;
   about: string;
@@ -17,8 +18,10 @@ interface WishData {
   short_paragraph: string;
   senders: string;
   gender: string;
+  eventDate: string;
   componentType:string;
-  poemabout: string
+  poemabout: string;
+}
 }
 
 interface InvitationProps {
@@ -104,13 +107,6 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
 
-  const throwConfetti = () => {
-    confetti({
-      particleCount: 400,
-      spread: 200,
-      origin: { y: 0.6 },
-    });
-  };
 
   const handleSurpriseClick = async () => {
     try {
@@ -194,7 +190,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             </div>
             <div className="relative group">
               <img
-                src={images[0] || "/placeholder.svg"}
+                src={imageUrls[0] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Event"
@@ -213,7 +209,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
               <img
-                src={images[1] || "/placeholder.svg"}
+                src={imageUrls[1] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Sender"
@@ -247,7 +243,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative group">
                   <img
-                    src={images[2] || "/placeholder.svg"}
+                    src={imageUrls[2] || "/placeholder.svg"}
                     width="260"
                     height="260"
                     alt="Celebration"
@@ -261,7 +257,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                 </div>
                 <div className="relative group">
                   <img
-                    src={images[3] || "/placeholder.svg"}
+                    src={imageUrls[3] || "/placeholder.svg"}
                     width="260"
                     height="260"
                     alt="Celebration"
@@ -277,7 +273,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
             </div>
             <div className="relative group">
               <img
-                src={images[4] || "/placeholder.svg"}
+                src={imageUrls[4] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Celebration"
@@ -296,7 +292,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
               <img
-                src={images[5] || "/placeholder.svg"}
+                src={imageUrls[5] || "/placeholder.svg"}
                 width="550"
                 height="550"
                 alt="Memories"
@@ -317,7 +313,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative group">
                   <img
-                    src={images[6] || "/placeholder.svg"}
+                    src={imageUrls[6] || "/placeholder.svg"}
                     width="260"
                     height="260"
                     alt="Memories"
@@ -330,40 +326,13 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                     </p>
                   </div>
                 </div>
-                <div className="relative group">
-                  <img
-                    src={images[7] || "/placeholder.svg"}
-                    width="260"
-                    height="260"
-                    alt="Memories"
-                    className="mx-auto aspect-square overflow-hidden rounded-xl object-cover"
-                  />
-                  <div className="absolute inset-0 bg-background/50 opacity-0 transition-opacity group-hover:opacity-100 flex items-center justify-center">
-                    <p className="text-muted-foreground text-center px-4">
-                      Discover the special ways we'll be sharing and preserving the memories from this celebration.
-                    </p>
-                  </div>
-                </div>
+               
               </div>
             </div>
           </div>
         </section>
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
-            <div className="relative group">
-              <img
-                src={images[8] || "/placeholder.svg"}
-                width="550"
-                height="550"
-                alt="Surprise"
-                className="mx-auto aspect-square overflow-hidden rounded-xl object-cover sm:w-full"
-              />
-              <div className="absolute inset-0 bg-background/50 opacity-0 transition-opacity group-hover:opacity-100 flex items-center justify-center">
-                <p className="text-muted-foreground text-center px-4">
-                  Get ready for a special surprise that will make this celebration even more memorable.
-                </p>
-              </div>
-            </div>
             <div className="space-y-4">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">A Surprise Awaits</h2>
               <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -371,7 +340,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                 unforgettable experience.
               </p>
               <Button
-              href="#"
+             
               className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
               onClick={handleSurpriseClick}
             >
@@ -393,7 +362,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
   )
 }
 
-function ArrowRightIcon(props) {
+function ArrowRightIcon(props:React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -414,7 +383,7 @@ function ArrowRightIcon(props) {
 }
 
 
-function GiftIcon(props) {
+function GiftIcon(props:React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -436,8 +405,7 @@ function GiftIcon(props) {
   )
 }
 
-
-function XIcon(props) {
+function XIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

@@ -32,7 +32,7 @@ import { S3Client, ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/clien
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import Image from "next/image";
 
-function AnimatedImage({ src, index, total }) {
+function AnimatedImage({ src, index, total }: { src: string; index: number; total: number }) {
   const angle = (index / total) * 2 * Math.PI;
   const radius = 150; // Adjust the radius as needed
 
@@ -46,20 +46,19 @@ function AnimatedImage({ src, index, total }) {
     config: { duration: 1000 },
     reset: true,
   });
+  const combinedTransform = `${styles.transform} translate(-50%, -50%)`;
 
   return (
     <animated.img
-      src={src}
-      className="absolute top-1/2 left-1/2 w-24 h-24 object-cover rounded-lg"
-      style={{
-        transform: `translate(-50%, -50%) rotate(${angle}rad) translate(${radius}px) rotate(${-angle}rad)`,
-        ...styles,
-      }}
-    />
+    src={src}
+    className="absolute top-1/2 left-1/2 w-24 h-24 object-cover rounded-lg"
+    style={{ transform: combinedTransform }}
+  />
   );
 }
 
 interface WishData {
+  webData: {
   title: string;
   recipient: string;
   about: string;
@@ -75,6 +74,7 @@ interface WishData {
   gender: string;
   componentType: string;
   poemabout: string;
+}
 }
 
 interface ChildProps {
@@ -167,7 +167,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
       origin: { y: 0.6 },
     });
   };
-  
+
   const handleSurpriseClick = async () => {
     try {
       // Check if audio already exists in S3
@@ -291,7 +291,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
-              {webData.facts.map((fact, index) => (
+              {webData.hobbies.map((fact, index) => (
                 <div key={index} className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-blue-100">
                     {/* You can dynamically switch icons here based on the fact type */}
@@ -303,7 +303,6 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
                   <div>
                     <div className="font-medium">{fact}</div>
                     <div className="text-sm text-blue-900/80">
-                      {fact.description}
                     </div>
                   </div>
                 </div>
@@ -352,7 +351,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
             </h3>
             <p className="mb-4 text-yellow-800"></p>
             <Button
-              href="#"
+             
               className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
               onClick={handleSurpriseClick}
             >

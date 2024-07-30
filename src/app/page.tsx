@@ -56,7 +56,7 @@ export default function Component() {
     }
   };
 
-  const generateAudio = async (id, message) => {
+  const generateAudio = async (id: string, message: string) => {
     try {
       const apiResponse = await fetch('/api/generate-songs', {
         method: 'POST',
@@ -79,12 +79,12 @@ export default function Component() {
 
       const data = await apiResponse.json();
       console.log('Audio generated and uploaded to S3:', data.s3Url);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating audio:', error.message);
     }
   };
 
-  const handleUploadSuccess = async (file) => {
+  const handleUploadSuccess = async (file: any) => {
     console.log('Uploaded file:', file);
 
     try {
@@ -110,12 +110,12 @@ export default function Component() {
       await generateImages(id, data.descriptions[0]);
 
       setImagesUploaded(true);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error generating description and images:', error.message);
     }
   };
 
-  const generateImages = async (id, description) => {
+  const generateImages = async (id: string, description: string) => {
     try {
       const response = await fetch('/api/generate-cute-photos', {
         method: 'POST',
@@ -133,7 +133,7 @@ export default function Component() {
 
       const data = await response.json();
       console.log('Images generated and uploaded to S3:', data.generatedImages);
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error generating images:', error.message);
     }
   };
@@ -185,11 +185,9 @@ export default function Component() {
               Image
             </label>
             <div className="mt-1">
-              <S3UploadForm onUpload={handleUploadSuccess} id={id} type="image">
-                <Button className="w-full bg-gradient-to-r from-green-400 to-blue-500 hover:from-green-500 hover:to-blue-600 text-white py-3 rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                  Select Image
-                </Button>
-              </S3UploadForm>
+              <S3UploadForm onUpload={handleUploadSuccess} id={id} type="image" />
+               
+                          
             </div>
           </div>
           <div>
@@ -197,11 +195,9 @@ export default function Component() {
               Video
             </label>
             <div className="mt-1">
-              <S3UploadForm onUpload={handleUploadSuccess} id={id} type="video">
-                <Button className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white py-3 rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                  Select Video
-                </Button>
-              </S3UploadForm>
+              <S3UploadForm onUpload={handleUploadSuccess} id={id} type="video" />
+            
+              
             </div>
           </div>
         </div>

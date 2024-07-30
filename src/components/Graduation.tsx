@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 
 interface WishData {
+  webData:{
   title: string;
   recipient: string;
   about: string;
@@ -19,7 +20,7 @@ interface WishData {
   senders: string;
   gender: string;
   componentType:string;
-  poemabout: string;
+  poemabout: string;}
 }
 
 interface GraduationProps {
@@ -282,7 +283,7 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
             <div className="mt-8">
               
             <Button
-              href="#"
+              
               className="inline-flex items-center justify-center rounded-md bg-white px-4 py-2 text-blue-600 font-medium shadow-sm transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
               onClick={handleSurpriseClick}
             >

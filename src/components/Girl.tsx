@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 
 interface WishData {
+  webData:{
   title: string;
   recipient: string;
   about: string;
@@ -17,6 +18,7 @@ interface WishData {
   gender: string;
   componentType:string;
   poemabout: string;
+}
 }
 
 interface GirlfriendProps {
@@ -37,6 +39,7 @@ const WaveImage: React.FC<{ src: string }> = ({ src }) => {
 };
 
 const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
+  
   const { webData } = wishData;
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
@@ -320,7 +323,7 @@ return (
                   {webData.recipient} ...
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
-                  {webData?.facts[0]}
+                  {webData?.hobbies[0]}
                 </div>
               </div>
             </div>
@@ -348,7 +351,7 @@ return (
                 {webData.recipient}...
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
-                {webData.facts[1]}
+                {webData.hobbies[1]}
                 </div>
               </div>
             </div>
@@ -362,7 +365,7 @@ return (
                 {webData.recipient} ...
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
-                {webData.facts[2]}
+                {webData.hobbies[2]}
                 </div>
               </div>
             </div>
