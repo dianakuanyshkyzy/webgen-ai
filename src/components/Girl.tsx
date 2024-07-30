@@ -37,40 +37,64 @@ const WaveImage: React.FC<{ src: string }> = ({ src }) => {
 };
 
 const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
-  const {webData} = wishData; 
+  const { webData } = wishData;
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
+  const [audio, setAudio] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
+  const [imageUrls, setImageUrls] = useState([]);
 
   useEffect(() => {
-    const fetchMedia = async () => {
+    const fetchGeneratedImages = async () => {
+      try {
+        const response = await fetch(`/api/s3-generated-photos?id=${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch generated images');
+        }
+        const data = await response.json();
+        setImageUrls(data.imageUrls);
+      } catch (error) {
+        console.error('Error fetching generated images:', error);
+      }
+    };
+
+    fetchGeneratedImages();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
       try {
         const imageResponse = await fetch(`/api/s3-images?id=${id}`);
-        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
-
         if (!imageResponse.ok) {
-          throw new Error('Failed to fetch images');
+          throw new Error("Failed to fetch images");
         }
-        if (!videoResponse.ok) {
-          throw new Error('Failed to fetch videos');
-        }
-
         const imageData = await imageResponse.json();
-        const videoData = await videoResponse.json();
-
         setImages(imageData.images || []);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+
+    const fetchVideos = async () => {
+      try {
+        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
+        if (!videoResponse.ok) {
+          throw new Error("Failed to fetch videos");
+        }
+        const videoData = await videoResponse.json();
         setVideos(videoData.videos || []);
       } catch (error) {
-        console.error('Error fetching media:', error);
+        console.error("Error fetching videos:", error);
       }
     };
 
     if (id) {
-      fetchMedia();
+      fetchImages();
+      fetchVideos();
     }
   }, [id]);
 
-  console.log(wishData); 
   const handleNextWish = () => {
     setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
   };
@@ -78,16 +102,18 @@ const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
   const handlePrevWish = () => {
     setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
   };
+
   useEffect(() => {
     const interval = setInterval(() => {
       handleNextWish();
     }, 5000);
     return () => clearInterval(interval); // Cleanup the interval on component unmount
   }, [webData.wishes.length]);
+
   if (!webData) {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
-   
+    
 
 return (
   <div className="flex flex-col bg-stone-100">
@@ -149,43 +175,6 @@ return (
                 </div>
               </div>
             </div>
-            {/* <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-              <div className="grow max-md:mt-10 max-md:max-w-full">
-                <div className="flex gap-5 max-md:flex-col max-md:gap-0">
-                  
-                  
-                  <div className="flex flex-col w-[82%] max-md:ml-0 max-md:w-full">
-                <div className="flex flex-col grow items-center py-6 px-6 w-full bg-fuchsia-300 rounded-2xl max-md:mt-8">
-                  <div className="flex justify-between w-full">
-                    <button
-                      className="text-gray-800 font-bold text-2xl"
-                      onClick={handlePrevWish}
-                    >
-                      &lt;
-                    </button>
-                    <button
-                      className="text-gray-800 font-bold text-2xl"
-                      onClick={handleNextWish}
-                    >
-                      &gt;
-                    </button>
-                  </div>
-                  <div className="flex flex-col items-center mt-4">
-                    
-                    <div className="mt-4 text-3xl font-medium tracking-tight">
-                    
-                    </div>
-                    <div className="mt-4 text-xl leading-8 text-center">
-                    </div>
-                  </div>
-                </div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> */}
       <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
                 <div className="grow max-md:mt-10 max-md:max-w-full">
                   <div className="flex flex-col w-[82%] max-md:ml-0 max-md:w-full">
@@ -243,13 +232,13 @@ return (
           }
         }}
         onMouseLeave={() => {}}
-      >  {images.length > 0 ? (
-        images.map((image, index) => (
+      >  {imageUrls.length > 0 ? (
+        imageUrls.map((image, index) => (
           <img src={image} key={index} width={600}
           height={400} className="object-cover rounded-lg aspect-video shrink-0 w-full max-w-[400px]"/>
           ))
       ) : (
-        <p>No images available</p>
+        <p></p>
       )} 
       </div>
 
@@ -284,7 +273,7 @@ return (
       />
     ))
   ) : (
-    <p>No videos available</p>
+    <p></p>
   )}
 </div>
       <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-background to-transparent pointer-events-none" />
@@ -320,7 +309,7 @@ return (
         </div>
       </div>
     </div>
-    {/**/}
+    
     <div className="flex justify-center items-center px-16 py-16 mt-1 w-full bg-stone-100 max-md:px-5 max-md:max-w-full">
       <div className="flex flex-col max-w-full w-[1022px]">
         <div className="mx-6 max-md:mr-2.5 max-md:max-w-full">
@@ -338,7 +327,7 @@ return (
             <div className="flex flex-col ml-5 w-[55%] max-md:ml-0 max-md:w-full">
               <img
                 loading="lazy"
-                srcSet="https://cdn.builder.io/api/v1/image/assets/TEMP/5b819e1486acc0f6c849899f8d041d07504f393e1950ebede40c7ca77eb100c2?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=100 100w, https://cdn.builder.io/api/v1/image/assets/TEMP/5b819e1486acc0f6c849899f8d041d07504f393e1950ebede40c7ca77eb100c2?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=200 200w, https://cdn.builder.io/api/v1/image/assets/TEMP/5b819e1486acc0f6c849899f8d041d07504f393e1950ebede40c7ca77eb100c2?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=400 400w, https://cdn.builder.io/api/v1/image/assets/TEMP/5b819e1486acc0f6c849899f8d041d07504f393e1950ebede40c7ca77eb100c2?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=800 800w, https://cdn.builder.io/api/v1/image/assets/TEMP/5b819e1486acc0f6c849899f8d041d07504f393e1950ebede40c7ca77eb100c2?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=1200 1200w, https://cdn.builder.io/api/v1/image/assets/TEMP/5b819e1486acc0f6c849899f8d041d07504f393e1950ebede40c7ca77eb100c2?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=1600 1600w, https://cdn.builder.io/api/v1/image/assets/TEMP/5b819e1486acc0f6c849899f8d041d07504f393e1950ebede40c7ca77eb100c2?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=2000 2000w, https://cdn.builder.io/api/v1/image/assets/TEMP/5b819e1486acc0f6c849899f8d041d07504f393e1950ebede40c7ca77eb100c2?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
+                srcSet={imageUrls[0]}
                 className="z-10 grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
             </div>
@@ -349,7 +338,7 @@ return (
             <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
               <img
                 loading="lazy"
-                srcSet="https://cdn.builder.io/api/v1/image/assets/TEMP/19b42872f9a0870fec3e7022ed5318dfbdddac00553c2145093a2e018985d448?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=100 100w, https://cdn.builder.io/api/v1/image/assets/TEMP/19b42872f9a0870fec3e7022ed5318dfbdddac00553c2145093a2e018985d448?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=200 200w, https://cdn.builder.io/api/v1/image/assets/TEMP/19b42872f9a0870fec3e7022ed5318dfbdddac00553c2145093a2e018985d448?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=400 400w, https://cdn.builder.io/api/v1/image/assets/TEMP/19b42872f9a0870fec3e7022ed5318dfbdddac00553c2145093a2e018985d448?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=800 800w, https://cdn.builder.io/api/v1/image/assets/TEMP/19b42872f9a0870fec3e7022ed5318dfbdddac00553c2145093a2e018985d448?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=1200 1200w, https://cdn.builder.io/api/v1/image/assets/TEMP/19b42872f9a0870fec3e7022ed5318dfbdddac00553c2145093a2e018985d448?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=1600 1600w, https://cdn.builder.io/api/v1/image/assets/TEMP/19b42872f9a0870fec3e7022ed5318dfbdddac00553c2145093a2e018985d448?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=2000 2000w, https://cdn.builder.io/api/v1/image/assets/TEMP/19b42872f9a0870fec3e7022ed5318dfbdddac00553c2145093a2e018985d448?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
+                srcSet={imageUrls[1]}
                 className="grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
             </div>
@@ -380,7 +369,7 @@ return (
             <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
               <img
                 loading="lazy"
-                srcSet="https://cdn.builder.io/api/v1/image/assets/TEMP/baec528ad9e590ce718e0237733c607dfc6131da093b68e6c327db7cc1dffc31?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=100 100w, https://cdn.builder.io/api/v1/image/assets/TEMP/baec528ad9e590ce718e0237733c607dfc6131da093b68e6c327db7cc1dffc31?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=200 200w, https://cdn.builder.io/api/v1/image/assets/TEMP/baec528ad9e590ce718e0237733c607dfc6131da093b68e6c327db7cc1dffc31?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=400 400w, https://cdn.builder.io/api/v1/image/assets/TEMP/baec528ad9e590ce718e0237733c607dfc6131da093b68e6c327db7cc1dffc31?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=800 800w, https://cdn.builder.io/api/v1/image/assets/TEMP/baec528ad9e590ce718e0237733c607dfc6131da093b68e6c327db7cc1dffc31?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=1200 1200w, https://cdn.builder.io/api/v1/image/assets/TEMP/baec528ad9e590ce718e0237733c607dfc6131da093b68e6c327db7cc1dffc31?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=1600 1600w, https://cdn.builder.io/api/v1/image/assets/TEMP/baec528ad9e590ce718e0237733c607dfc6131da093b68e6c327db7cc1dffc31?apiKey=74627f4a04b34f4c896e1b7417ba3997&width=2000 2000w, https://cdn.builder.io/api/v1/image/assets/TEMP/baec528ad9e590ce718e0237733c607dfc6131da093b68e6c327db7cc1dffc31?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
+                srcSet={imageUrls[2]}
                 className="grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
             </div>
@@ -391,8 +380,7 @@ return (
     
 
       </div>
-      
-  //*/}
+
 );
 }; 
 

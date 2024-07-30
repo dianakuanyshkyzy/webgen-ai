@@ -31,13 +31,6 @@ import React, { useState, useEffect } from "react";
 import { S3Client, ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import Image from "next/image";
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
 
 function AnimatedImage({ src, index, total }) {
   const angle = (index / total) * 2 * Math.PI;
@@ -174,7 +167,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
       origin: { y: 0.6 },
     });
   };
-
+  
   const handleSurpriseClick = async () => {
     try {
       // Check if audio already exists in S3
@@ -209,43 +202,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
       console.error("Error fetching or generating audio:", error);
     }
   };
-  const handleGenerateDescriptions = async () => {
-    try {
-      const response = await fetch("/api/generate-description", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id }),
-      });
-  
-      const data = await response.json();
-      console.log("Response received from generate-description:", response);
-  
-      if (response.ok) {
-        const descriptionResponse = await fetch("/api/generate-cute-photos", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ descriptions: data.descriptions, id }),
-        });
-  
-        const generatedData = await descriptionResponse.json();
-        if (descriptionResponse.ok) {
-          setGeneratedImages(generatedData.generatedImages);
-        } else {
-          console.error("Error generating cute photos:", generatedData.error);
-        }
-      } else {
-        console.error("Error generating descriptions:", data.error);
-      }
-    } catch (error: any) {
-      console.error("Error generating descriptions:", error.message);
-    }
-  };
-  
-  
+    
 
   return (
     <div className="flex flex-col min-h-dvh bg-[#f0f8ff] text-foreground">

@@ -28,36 +28,61 @@ interface GraduationProps {
 }
 
 const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
-  const { webData } = wishData; 
+  const { webData } = wishData;
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
+  const [audio, setAudio] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
+  const [imageUrls, setImageUrls] = useState([]);
 
   useEffect(() => {
-    const fetchMedia = async () => {
+    const fetchGeneratedImages = async () => {
+      try {
+        const response = await fetch(`/api/s3-generated-photos?id=${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch generated images');
+        }
+        const data = await response.json();
+        setImageUrls(data.imageUrls);
+      } catch (error) {
+        console.error('Error fetching generated images:', error);
+      }
+    };
+
+    fetchGeneratedImages();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
       try {
         const imageResponse = await fetch(`/api/s3-images?id=${id}`);
-        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
-
         if (!imageResponse.ok) {
-          throw new Error('Failed to fetch images');
+          throw new Error("Failed to fetch images");
         }
-        if (!videoResponse.ok) {
-          throw new Error('Failed to fetch videos');
-        }
-
         const imageData = await imageResponse.json();
-        const videoData = await videoResponse.json();
-
         setImages(imageData.images || []);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+
+    const fetchVideos = async () => {
+      try {
+        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
+        if (!videoResponse.ok) {
+          throw new Error("Failed to fetch videos");
+        }
+        const videoData = await videoResponse.json();
         setVideos(videoData.videos || []);
       } catch (error) {
-        console.error('Error fetching media:', error);
+        console.error("Error fetching videos:", error);
       }
     };
 
     if (id) {
-      fetchMedia();
+      fetchImages();
+      fetchVideos();
     }
   }, [id]);
 
@@ -69,17 +94,54 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
     setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
   };
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     handleNextWish();
-  //   }, 5000);
-  //   return () => clearInterval(interval); // Cleanup the interval on component unmount
-  // }, [webData?.wishes.length]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleNextWish();
+    }, 5000);
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
+  }, [webData.wishes.length]);
 
   if (!webData) {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
-  } 
+  }
 
+  
+
+  const handleSurpriseClick = async () => {
+    try {
+      // Check if audio already exists in S3
+      const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+
+      if (audioResponse.ok) {
+        const audioData = await audioResponse.json();
+        setAudio(audioData.audio[0] || null);
+      } else {
+        // Generate audio if it doesn't exist
+        const generateResponse = await fetch("/api/generate-songs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: webData.recipient,
+            make_instrumental: false,
+            wait_audio: true,
+          }),
+        });
+
+        if (generateResponse.ok) {
+          const data = await generateResponse.json();
+          setAudio(data.audio_url);
+        } else {
+          const errorData = await generateResponse.json();
+          console.error("Error generating audio:", errorData.error);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching or generating audio:", error);
+    }
+  };
+    
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <header className="bg-gradient-to-r from-blue-600 to-blue-400 py-12 px-4 md:px-6 lg:px-8">
@@ -104,7 +166,7 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
           <div className="container mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <img
-                src={images[0]}
+                src={imageUrls[0]}
                 width={400}
                 height={500}
                 alt="Graduate Portrait"
@@ -126,19 +188,19 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
           <div className="container mx-auto max-w-5xl">
             <h2 className="text-3xl font-bold tracking-tight text-center text-blue-600">Gallery</h2>
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {images.length > 0 ? (
+              {imageUrls.length > 0 ? (
                 <>
                   <div className="lg:col-span-2 lg:row-span-2">
                     <div className="grid grid-cols-2 gap-4 md:gap-6 lg:gap-8">
                       <img
-                        src={images[0]}
+                        src={imageUrls[0]}
                         alt="Gallery Image"
                         width={600}
                         height={400}
                         className="aspect-[3/2] w-full overflow-hidden rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
                       />
                       <img
-                        src={images[1]}
+                        src={imageUrls[1]}
                         alt="Gallery Image"
                         width={400}
                         height={600}
@@ -146,7 +208,7 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
                       />
                       <div className="col-span-2 row-span-2 overflow-hidden rounded-lg">
                         <img
-                          src={images[2]}
+                          src={imageUrls[2]}
                           alt="Gallery Image"
                           width={1200}
                           height={800}
@@ -163,28 +225,28 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
                   </div>
                   <div className="grid grid-cols-2 gap-4 md:gap-6 lg:gap-8">
                     <img
-                      src={images[3]}
+                      src={imageUrls[3]}
                       alt="Gallery Image"
                       width={400}
                       height={300}
                       className="aspect-[4/3] w-full overflow-hidden rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
                     />
                     <img
-                      src={images[4]}
+                      src={imageUrls[4]}
                       alt="Gallery Image"
                       width={300}
                       height={400}
                       className="aspect-[3/4] w-full overflow-hidden rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
                     />
                     <img
-                      src={images[5]}
+                      src={imageUrls[5]}
                       alt="Gallery Image"
                       width={400}
                       height={400}
                       className="aspect-square w-full overflow-hidden rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
                     />
                     <img
-                      src={images[6]}
+                      src={imageUrls[6]}
                       alt="Gallery Image"
                       width={300}
                       height={300}
@@ -218,9 +280,22 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
             <p className="mt-4 text-lg">
             </p>
             <div className="mt-8">
-              <Button className="inline-flex items-center justify-center rounded-md bg-white px-4 py-2 text-blue-600 font-medium shadow-sm transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">
-                Click on me
-              </Button>
+              
+            <Button
+              href="#"
+              className="inline-flex items-center justify-center rounded-md bg-white px-4 py-2 text-blue-600 font-medium shadow-sm transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+              onClick={handleSurpriseClick}
+            >
+              Click me!
+            </Button>
+            {audio && (
+              <div className="mt-4">
+                <audio controls>
+                  <source src={audio} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            )}
             </div>
           </div>
         </section>

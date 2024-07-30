@@ -16,7 +16,7 @@ interface WishData {
   paragraph: string;
   characteristics: string[];
   short_paragraph: string;
-  senders: string;
+  senders: string[];
   gender: string;
   componentType: string;
   poemabout: string;
@@ -31,37 +31,60 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
   const { webData } = wishData;
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
+  const [audio, setAudio] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [showSurprise, setShowSurprise] = useState(false);
-  const [generatedMusic, setGeneratedMusic] = useState<string | null>(null);
+  const [imageUrls, setImageUrls] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMedia = async () => {
+    const fetchGeneratedImages = async () => {
+      try {
+        const response = await fetch(`/api/s3-generated-photos?id=${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch generated images');
+        }
+        const data = await response.json();
+        setImageUrls(data.imageUrls);
+      } catch (error) {
+        console.error('Error fetching generated images:', error);
+      }
+    };
+
+    fetchGeneratedImages();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
       try {
         const imageResponse = await fetch(`/api/s3-images?id=${id}`);
-        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
-
         if (!imageResponse.ok) {
-          throw new Error('Failed to fetch images');
+          throw new Error("Failed to fetch images");
         }
-        if (!videoResponse.ok) {
-          throw new Error('Failed to fetch videos');
-        }
-
         const imageData = await imageResponse.json();
-        const videoData = await videoResponse.json();
-
         setImages(imageData.images || []);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+
+    const fetchVideos = async () => {
+      try {
+        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
+        if (!videoResponse.ok) {
+          throw new Error("Failed to fetch videos");
+        }
+        const videoData = await videoResponse.json();
         setVideos(videoData.videos || []);
       } catch (error) {
-        console.error('Error fetching media:', error);
+        console.error("Error fetching videos:", error);
       }
     };
 
     if (id) {
-      fetchMedia();
+      fetchImages();
+      fetchVideos();
     }
   }, [id]);
 
@@ -69,12 +92,66 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
     setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
   };
 
+  const handlePrevWish = () => {
+    setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       handleNextWish();
     }, 5000);
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
   }, [webData.wishes.length]);
+
+  if (!webData) {
+    return <div>Loading...</div>; // Adjust this to your preferred loading state
+  }
+
+  const throwConfetti = () => {
+    confetti({
+      particleCount: 400,
+      spread: 200,
+      origin: { y: 0.6 },
+    });
+  };
+
+  const handleSurpriseClick = async () => {
+    try {
+      setLoading(true);
+      // Check if audio already exists in S3
+      const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+
+      if (audioResponse.ok) {
+        const audioData = await audioResponse.json();
+        setAudio(audioData.audio[0] || null);
+      } else {
+        // Generate audio if it doesn't exist
+        const generateResponse = await fetch("/api/generate-songs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: webData.recipient,
+            make_instrumental: false,
+            wait_audio: true,
+          }),
+        });
+
+        if (generateResponse.ok) {
+          const data = await generateResponse.json();
+          setAudio(data.audio_url);
+        } else {
+          const errorData = await generateResponse.json();
+          console.error("Error generating audio:", errorData.error);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching or generating audio:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openImage = (image: string) => {
     setSelectedImage(image);
@@ -83,39 +160,6 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
   const closeImage = () => {
     setSelectedImage(null);
   };
-
-  const toggleSurprise = async () => {
-    setShowSurprise(!showSurprise);
-    if (!showSurprise) {
-      try {
-        setLoading(true);
-        console.log('Sending request to generate music with prompt:', webData.recipient);
-        const response = await fetch('/api/generate-songs', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt: webData.recipient, make_instrumental: false, wait_audio: true }),
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          console.log('Received response:', data);
-          setGeneratedMusic(data[0].audio_url);
-        } else {
-          console.error('Error:', data.error);
-        }
-      } catch (error) {
-        console.error('Error generating music:', error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  if (!webData) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div style={{ fontFamily: "'Roboto', sans-serif", background: "#f5f5f0", color: "#3b3b3b", padding: '20px' }}>
@@ -146,8 +190,8 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <h2 style={{ fontSize: '2em', fontWeight: 'bold', textAlign: 'center', marginBottom: '40px' }}>Images</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '20px' }}>
-              {images.length > 0 ? (
-                images.map((image, index) => (
+              {imageUrls.length > 0 ? (
+                imageUrls.map((image, index) => (
                   <div key={index} style={{ position: 'relative', overflow: 'hidden', borderRadius: '10px', cursor: 'pointer' }} onClick={() => openImage(image)}>
                     <img
                       src={image}
@@ -214,16 +258,16 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
         </section>
       </main>
       <footer style={{ textAlign: 'center', padding: '40px 20px', background: '#f5f5dc' }}>
-        <button onClick={toggleSurprise} style={{ backgroundColor: '#ff69b4', color: 'white', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
-          {loading ? 'Generating...' : 'Click on me'}
+        <button onClick={handleSurpriseClick} style={{ backgroundColor: '#ff69b4', color: 'white', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+          {loading ? 'Generating...' : 'Open Song'}
         </button>
         <div style={{ marginTop: '20px', color: '#ff69b4', fontWeight: 'bold' }}>
-          {/* {generatedMusic ? ( */}
+          {audio && (
             <audio controls>
-              <source src={generatedMusic} type="audio/mpeg" />
+              <source src={audio} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
-          {/* )  */}
+          )}
         </div>
       </footer>
       {selectedImage && (

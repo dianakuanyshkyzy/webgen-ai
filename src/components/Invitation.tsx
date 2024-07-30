@@ -27,40 +27,64 @@ interface InvitationProps {
 }
 
 const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
-  const {webData} = wishData; 
+  const { webData } = wishData;
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
+  const [audio, setAudio] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
+  const [imageUrls, setImageUrls] = useState([]);
 
   useEffect(() => {
-    const fetchMedia = async () => {
+    const fetchGeneratedImages = async () => {
+      try {
+        const response = await fetch(`/api/s3-generated-photos?id=${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch generated images');
+        }
+        const data = await response.json();
+        setImageUrls(data.imageUrls);
+      } catch (error) {
+        console.error('Error fetching generated images:', error);
+      }
+    };
+
+    fetchGeneratedImages();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchImages = async () => {
       try {
         const imageResponse = await fetch(`/api/s3-images?id=${id}`);
-        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
-
         if (!imageResponse.ok) {
-          throw new Error('Failed to fetch images');
+          throw new Error("Failed to fetch images");
         }
-        if (!videoResponse.ok) {
-          throw new Error('Failed to fetch videos');
-        }
-
         const imageData = await imageResponse.json();
-        const videoData = await videoResponse.json();
-
         setImages(imageData.images || []);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+
+    const fetchVideos = async () => {
+      try {
+        const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
+        if (!videoResponse.ok) {
+          throw new Error("Failed to fetch videos");
+        }
+        const videoData = await videoResponse.json();
         setVideos(videoData.videos || []);
       } catch (error) {
-        console.error('Error fetching media:', error);
+        console.error("Error fetching videos:", error);
       }
     };
 
     if (id) {
-      fetchMedia();
+      fetchImages();
+      fetchVideos();
     }
   }, [id]);
 
-  console.log(wishData); 
   const handleNextWish = () => {
     setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
   };
@@ -68,15 +92,61 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
   const handlePrevWish = () => {
     setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
   };
+
   useEffect(() => {
     const interval = setInterval(() => {
       handleNextWish();
     }, 5000);
     return () => clearInterval(interval); // Cleanup the interval on component unmount
   }, [webData.wishes.length]);
+
   if (!webData) {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
+
+  const throwConfetti = () => {
+    confetti({
+      particleCount: 400,
+      spread: 200,
+      origin: { y: 0.6 },
+    });
+  };
+
+  const handleSurpriseClick = async () => {
+    try {
+      // Check if audio already exists in S3
+      const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+
+      if (audioResponse.ok) {
+        const audioData = await audioResponse.json();
+        setAudio(audioData.audio[0] || null);
+      } else {
+        // Generate audio if it doesn't exist
+        const generateResponse = await fetch("/api/generate-songs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: webData.recipient,
+            make_instrumental: false,
+            wait_audio: true,
+          }),
+        });
+
+        if (generateResponse.ok) {
+          const data = await generateResponse.json();
+          setAudio(data.audio_url);
+        } else {
+          const errorData = await generateResponse.json();
+          console.error("Error generating audio:", errorData.error);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching or generating audio:", error);
+    }
+  };
+  
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <header className="bg-background px-4 lg:px-6 py-4 flex items-center justify-between">
@@ -298,77 +368,27 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">A Surprise Awaits</h2>
               <p className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
                 We've planned a special surprise that we can't wait to share with you at the event. It's going to be an
-                unforgettable experience, so make sure to RSVP and join us.
+                unforgettable experience.
               </p>
-              <Button>Open for Surprise</Button>
+              <Button
+              href="#"
+              className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
+              onClick={handleSurpriseClick}
+            >
+              Click me!
+            </Button>
+            {audio && (
+              <div className="mt-4">
+                <audio controls>
+                  <source src={audio} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            )}
             </div>
           </div>
         </section>
       </main>
-      <footer className="bg-muted p-6 md:py-12 w-full">
-        <div className="container max-w-7xl grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 text-sm">
-          <div className="grid gap-1">
-            <h3 className="font-semibold">Event Details</h3>
-            <Link href="#" prefetch={false}>
-              Date
-            </Link>
-            <Link href="#" prefetch={false}>
-              Time
-            </Link>
-            <Link href="#" prefetch={false}>
-              Location
-            </Link>
-          </div>
-          <div className="grid gap-1">
-            <h3 className="font-semibold">About</h3>
-            <Link href="#" prefetch={false}>
-              The Host
-            </Link>
-            <Link href="#" prefetch={false}>
-              Our Story
-            </Link>
-            <Link href="#" prefetch={false}>
-              Contact
-            </Link>
-          </div>
-          <div className="grid gap-1">
-            <h3 className="font-semibold">Celebration</h3>
-            <Link href="#" prefetch={false}>
-              Activities
-            </Link>
-            <Link href="#" prefetch={false}>
-              Memories
-            </Link>
-            <Link href="#" prefetch={false}>
-              Surprises
-            </Link>
-          </div>
-          <div className="grid gap-1">
-            <h3 className="font-semibold">RSVP</h3>
-            <Link href="#" prefetch={false}>
-              RSVP Now
-            </Link>
-            <Link href="#" prefetch={false}>
-              Special Requests
-            </Link>
-            <Link href="#" prefetch={false}>
-              FAQ
-            </Link>
-          </div>
-          <div className="grid gap-1">
-            <h3 className="font-semibold">Follow Us</h3>
-            <Link href="#" prefetch={false}>
-              Instagram
-            </Link>
-            <Link href="#" prefetch={false}>
-              Facebook
-            </Link>
-            <Link href="#" prefetch={false}>
-              Twitter
-            </Link>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
