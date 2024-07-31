@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
-import Countdown from './ui/countdown';
 import Image from 'next/image';
 interface WishData {
   webData:{
@@ -206,9 +205,7 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
             {webData.short_paragraph}
           </div>
         </div>
-        <div className="px-4 py-6 mt-4 w-full max-w-[960px] max-md:max-w-full">
-          <Countdown targetDate={webData.eventDate} />
-        </div>
+        
         <div className="px-4 py-6 mt-4 w-full max-w-[960px] max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col max-md:gap-0">
             <div className="flex flex-col w-3/12 max-md:ml-0 max-md:w-full">
