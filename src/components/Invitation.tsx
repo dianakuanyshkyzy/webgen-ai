@@ -1,27 +1,27 @@
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import React, { useState, useEffect } from 'react';
+import { useSpring, animated } from 'react-spring';
 
 interface WishData {
-  webData: {
-    title: string;
-    recipient: string;
-    about: string;
-    images: string[];
-    quotes: string[];
-    videos: string[];
-    wishes: string[];
-    hobbies: string[];
-    paragraph: string;
-    characteristics: string[];
-    short_paragraph: string;
-    senders: string;
-    gender: string;
-    eventDate: string;
-    componentType: string;
-    poemabout: string;
-  }
+  webData:{
+  title: string;
+  recipient: string;
+  about: string;
+  images: string[];
+  quotes: string[];
+  videos: string[];
+  wishes: string[];
+  hobbies: string[];
+  paragraph: string;
+  characteristics: string[];
+  short_paragraph: string;
+  senders: string;
+  gender: string;
+  eventDate: string;
+  componentType:string;
+  poemabout: string;
+}
 }
 
 interface InvitationProps {
@@ -36,7 +36,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
   const [audio, setAudio] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
@@ -107,6 +107,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
 
+
   const handleSurpriseClick = async () => {
     try {
       // Check if audio already exists in S3
@@ -141,7 +142,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
       console.error("Error fetching or generating audio:", error);
     }
   };
-
+  
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <header className="bg-background px-4 lg:px-6 py-4 flex items-center justify-between">
@@ -188,7 +189,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               </div>
             </div>
             <div className="relative group">
-              <Image
+              <img
                 src={imageUrls[0] || "/placeholder.svg"}
                 width="550"
                 height="550"
@@ -207,7 +208,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
-              <Image
+              <img
                 src={imageUrls[1] || "/placeholder.svg"}
                 width="550"
                 height="550"
@@ -241,7 +242,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative group">
-                  <Image
+                  <img
                     src={imageUrls[2] || "/placeholder.svg"}
                     width="260"
                     height="260"
@@ -255,7 +256,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                   </div>
                 </div>
                 <div className="relative group">
-                  <Image
+                  <img
                     src={imageUrls[3] || "/placeholder.svg"}
                     width="260"
                     height="260"
@@ -271,7 +272,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               </div>
             </div>
             <div className="relative group">
-              <Image
+              <img
                 src={imageUrls[4] || "/placeholder.svg"}
                 width="550"
                 height="550"
@@ -290,7 +291,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
-              <Image
+              <img
                 src={imageUrls[5] || "/placeholder.svg"}
                 width="550"
                 height="550"
@@ -311,8 +312,8 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative group">
-                  <Image
-                    src={imageUrls[6] || "/placeholder.svg"}
+                  <img
+                    src={imageUrls[0] || "/placeholder.svg"}
                     width="260"
                     height="260"
                     alt="Memories"
@@ -325,6 +326,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                     </p>
                   </div>
                 </div>
+               
               </div>
             </div>
           </div>
@@ -338,19 +340,20 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                 unforgettable experience.
               </p>
               <Button
-                className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
-                onClick={handleSurpriseClick}
-              >
-                Click me!
-              </Button>
-              {audio && (
-                <div className="mt-4">
-                  <audio controls>
-                    <source src={audio} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                  </audio>
-                </div>
-              )}
+             
+              className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
+              onClick={handleSurpriseClick}
+            >
+              Click me!
+            </Button>
+            {audio && (
+              <div className="mt-4">
+                <audio controls>
+                  <source src={audio} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            )}
             </div>
           </div>
         </section>
@@ -359,7 +362,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
   )
 }
 
-function ArrowRightIcon(props: React.SVGProps<SVGSVGElement>) {
+function ArrowRightIcon(props:React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -379,7 +382,8 @@ function ArrowRightIcon(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
-function GiftIcon(props: React.SVGProps<SVGSVGElement>) {
+
+function GiftIcon(props:React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
@@ -421,4 +425,4 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
-export default Invitation;
+export default Invitation; 

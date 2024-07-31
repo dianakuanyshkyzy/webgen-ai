@@ -1,27 +1,25 @@
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { Button } from "./ui/button";
-import Image from "next/image";
-
+import {Button} from './ui/button';
 interface WishData {
   webData: {
-    title: string;
-    recipient: string;
-    about: string;
-    images: string[];
-    quotes: string[];
-    videos: string[];
-    wishes: string[];
-    hobbies: string[];
-    paragraph: string;
-    characteristics: string[];
-    short_paragraph: string;
-    senders: string;
-    gender: string;
-    componentType: string;
-    poemabout: string;
-  };
+  title: string;
+  recipient: string;
+  about: string;
+  images: string[];
+  quotes: string[];
+  videos: string[];
+  wishes: string[];
+  hobbies: string[];
+  paragraph: string;
+  characteristics: string[];
+  short_paragraph: string;
+  senders: string;
+  gender: string;
+  componentType: string;
+  poemabout: string;
+}
 }
 
 interface GetWellProps {
@@ -39,19 +37,19 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
   const [audio, setAudio] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
       try {
         const response = await fetch(`/api/s3-generated-photos?id=${id}`);
         if (!response.ok) {
-          throw new Error("Failed to fetch generated images");
+          throw new Error('Failed to fetch generated images');
         }
         const data = await response.json();
         setImageUrls(data.imageUrls);
       } catch (error) {
-        console.error("Error fetching generated images:", error);
+        console.error('Error fetching generated images:', error);
       }
     };
 
@@ -92,11 +90,11 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
   }, [id]);
 
   const handleNextWish = () => {
-    setCurrentWish((prev) => (prev + 1) % webData.wishes.length);
+    setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
   };
 
   const handlePrevWish = () => {
-    setCurrentWish((prev) => (prev - 1 + webData.wishes.length) % webData.wishes.length);
+    setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
   };
 
   useEffect(() => {
@@ -144,7 +142,7 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
       console.error("Error fetching or generating audio:", error);
     }
   };
-
+  
   const nextVideo = () => {
     setCurrentVideo((prev) => (prev + 1) % videos.length);
   };
@@ -188,10 +186,10 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
         <section style={{ marginBottom: '20px' }}>
           <h2 style={{ fontSize: '1.25em', fontWeight: '600', marginBottom: '16px', color: '#ff69b4' }}>Images</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '16px' }}>
-            {images.length > 0 ? (
-              images.map((image, index) => (
+            {imageUrls.length > 0 ? (
+              imageUrls.map((image, index) => (
                 <div key={index} style={{ position: 'relative', overflow: 'hidden', borderRadius: '8px', cursor: 'pointer' }} onClick={() => openImage(image)}>
-                  <Image
+                  <img
                     src={image}
                     alt={`Memory ${index + 1}`}
                     style={{ objectFit: 'cover', width: '100%', height: '100%', transition: 'transform 0.3s ease-in-out' }}
@@ -238,25 +236,26 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
           <p style={{ color: '#1f2937' }}>{webData.paragraph}</p>
         </section>
         <footer style={{ textAlign: 'center', marginTop: '20px' }}>
-          <Button
-            className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
-            onClick={handleSurpriseClick}
-          >
-            Click me!
-          </Button>
-          {audio && (
-            <div className="mt-4">
-              <audio controls>
-                <source src={audio} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-            </div>
-          )}
+        <Button
+              
+              className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
+              onClick={handleSurpriseClick}
+            >
+              Click me!
+            </Button>
+            {audio && (
+              <div className="mt-4">
+                <audio controls>
+                  <source src={audio} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+            )}
         </footer>
       </div>
       {selectedImage && (
         <div style={{ position: 'fixed', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1000' }} onClick={closeImage}>
-          <Image src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} width={600} height={600} />
+          <img src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
         </div>
       )}
     </div>

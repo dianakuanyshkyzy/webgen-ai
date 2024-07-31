@@ -171,7 +171,7 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
                   <Image src={image} alt={`Memory ${index + 1}`} className="mb-4 rounded-lg" width={500} height={500} />
                 </div>
               )) : (
-                <div className="text-[#d1d5db]">No memories available</div>
+                <div className="text-[#d1d5db]"></div>
               )}
               {videos.length > 0 ? (
                 videos.map((video, index) => (
@@ -188,7 +188,8 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
                   </div>
                 ))
               ) : (
-                <div className="text-[#d1d5db]">No memories available</div>
+                <div className="text-[#d1d5db]">
+                </div>
               )}
             </div>
           </div>

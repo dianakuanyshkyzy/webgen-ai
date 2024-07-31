@@ -1,7 +1,6 @@
 'use client';
 
 import Link from "next/link";
-import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from 'react';
 
@@ -25,21 +24,23 @@ interface WishData {
     description: string;
     recipient: string;
     eventDate: string;
-  };
+  
+}
 }
 
-interface ThankYouProps {
+interface ThankyouProps {
   wishData: WishData;
   id: string;
 }
 
-const ThankYou: React.FC<ThankYouProps> = ({ wishData, id }) => {
+const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
   const { webData } = wishData;
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
   const [audio, setAudio] = useState<string | null>(null);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -100,28 +101,30 @@ const ThankYou: React.FC<ThankYouProps> = ({ wishData, id }) => {
   const handlePrevWish = () => {
     setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
   };
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       handleNextWish();
     }, 5000);
-    return () => clearInterval(interval);
-  }, [handleNextWish, webData.wishes.length]); // Add handleNextWish as a dependency
-  
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
+  }, [webData.wishes.length]);
 
   if (!webData) {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
 
+  
   const handleSurpriseClick = async () => {
     try {
       setLoading(true);
+      // Check if audio already exists in S3
       const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
         setAudio(audioData.audio[0] || null);
       } else {
+        // Generate audio if it doesn't exist
         const generateResponse = await fetch("/api/generate-songs", {
           method: "POST",
           headers: {
@@ -166,9 +169,9 @@ const ThankYou: React.FC<ThankYouProps> = ({ wishData, id }) => {
             <span className="sr-only">Thank You Notes</span>
           </Link>
           <nav style={{ display: 'flex', gap: '20px' }}>
-            <Link href="#images" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Images</Link>
-            <Link href="#videos" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Videos</Link>
-            <Link href="#messages" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Messages</Link>
+            <Link href="#" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Images</Link>
+            <Link href="#" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Videos</Link>
+            <Link href="#" style={{ fontSize: '16px', fontWeight: '500', color: '#3b3b3b', textDecoration: 'none' }} prefetch={false}>Messages</Link>
           </nav>
           <Button>Get Started</Button>
         </div>
@@ -189,12 +192,10 @@ const ThankYou: React.FC<ThankYouProps> = ({ wishData, id }) => {
               {imageUrls.length > 0 ? (
                 imageUrls.map((image, index) => (
                   <div key={index} style={{ position: 'relative', overflow: 'hidden', borderRadius: '10px', cursor: 'pointer' }} onClick={() => openImage(image)}>
-                    <Image
+                    <img
                       src={image}
                       alt={`Memory ${index + 1}`}
-                      layout="fill"
-                      objectFit="cover"
-                      style={{ transition: 'transform 0.3s ease-in-out' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease-in-out' }}
                       className="hover:scale-105"
                     />
                     <div style={{ position: 'absolute', bottom: '0', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white', textAlign: 'center', padding: '5px', opacity: '0', transition: 'opacity 0.3s ease-in-out' }} className="hover:opacity-100">
@@ -237,7 +238,7 @@ const ThankYou: React.FC<ThankYouProps> = ({ wishData, id }) => {
               {webData.wishes.map((wish, index) => (
                 <div key={index} style={{ background: '#fff', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
                   <p style={{ fontSize: '1.25em', color: '#3b3b3b' }}>{wish}</p>
-                  <p style={{ textAlign: 'right', fontSize: '1em', color: '#9b9b9b' }}>- {webData.senders}</p>
+                  <p style={{ textAlign: 'right', fontSize: '1em', color: '#9b9b9b' }}>- {webData.senders[index]}</p>
                 </div>
               ))}
             </div>
@@ -270,14 +271,14 @@ const ThankYou: React.FC<ThankYouProps> = ({ wishData, id }) => {
       </footer>
       {selectedImage && (
         <div style={{ position: 'fixed', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1000' }} onClick={closeImage}>
-          <Image src={selectedImage} alt="Full format" layout="fill" objectFit="contain" style={{ borderRadius: '8px' }} />
+          <img src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
         </div>
       )}
     </div>
   );
 };
 
-function GiftIcon(props: React.SVGProps<SVGSVGElement>) {
+function GiftIcon(props:React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}
