@@ -100,13 +100,14 @@ const ThankYou: React.FC<ThankYouProps> = ({ wishData, id }) => {
   const handlePrevWish = () => {
     setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
   };
-
+  
   useEffect(() => {
     const interval = setInterval(() => {
       handleNextWish();
     }, 5000);
-    return () => clearInterval(interval); // Cleanup the interval on component unmount
-  }, [webData.wishes.length]);
+    return () => clearInterval(interval);
+  }, [handleNextWish, webData.wishes.length]); // Add handleNextWish as a dependency
+  
 
   if (!webData) {
     return <div>Loading...</div>; // Adjust this to your preferred loading state

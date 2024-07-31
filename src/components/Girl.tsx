@@ -110,7 +110,8 @@ const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
       handleNextWish();
     }, 5000);
     return () => clearInterval(interval);
-  }, [webData.wishes.length]);
+  }, [handleNextWish, webData.wishes.length]); // Add handleNextWish as a dependency
+  
 
   if (!webData) {
     return <div>Loading...</div>;
