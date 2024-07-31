@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN yarn install
 
 # Copy the rest of the application code
-COPY .env ./
+COPY .env .env 
 COPY . . 
 
 # Build the Next.js application
