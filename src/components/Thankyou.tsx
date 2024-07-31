@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from 'react';
-
+import Image from "next/image";
 interface WishData {
   webData: {
     title: string;
@@ -192,7 +192,7 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
               {imageUrls.length > 0 ? (
                 imageUrls.map((image, index) => (
                   <div key={index} style={{ position: 'relative', overflow: 'hidden', borderRadius: '10px', cursor: 'pointer' }} onClick={() => openImage(image)}>
-                    <img
+                    <Image
                       src={image}
                       alt={`Memory ${index + 1}`}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease-in-out' }}
@@ -271,7 +271,7 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
       </footer>
       {selectedImage && (
         <div style={{ position: 'fixed', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1000' }} onClick={closeImage}>
-          <img src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
+          <Image src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
         </div>
       )}
     </div>

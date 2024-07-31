@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
-
+import Image from "next/image";
 interface WishData {
   webData:{
   title: string;
@@ -189,7 +189,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               </div>
             </div>
             <div className="relative group">
-              <img
+              <Image
                 src={imageUrls[0] || "/placeholder.svg"}
                 width="550"
                 height="550"
@@ -208,7 +208,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
-              <img
+              <Image
                 src={imageUrls[1] || "/placeholder.svg"}
                 width="550"
                 height="550"
@@ -242,7 +242,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative group">
-                  <img
+                  <Image
                     src={imageUrls[2] || "/placeholder.svg"}
                     width="260"
                     height="260"
@@ -256,7 +256,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
                   </div>
                 </div>
                 <div className="relative group">
-                  <img
+                  <Image
                     src={imageUrls[3] || "/placeholder.svg"}
                     width="260"
                     height="260"
@@ -272,7 +272,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               </div>
             </div>
             <div className="relative group">
-              <img
+              <Image
                 src={imageUrls[4] || "/placeholder.svg"}
                 width="550"
                 height="550"
@@ -291,7 +291,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 grid gap-8 lg:grid-cols-2 lg:gap-16">
             <div className="relative group">
-              <img
+              <Image
                 src={imageUrls[5] || "/placeholder.svg"}
                 width="550"
                 height="550"
@@ -312,7 +312,7 @@ const Invitation: React.FC<InvitationProps> = ({ wishData, id }) => {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="relative group">
-                  <img
+                  <Image
                     src={imageUrls[0] || "/placeholder.svg"}
                     width="260"
                     height="260"

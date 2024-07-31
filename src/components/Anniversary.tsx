@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import Countdown from './ui/countdown';
-
+import Image from 'next/image';
 interface WishData {
   webData:{
   title: string;
@@ -182,7 +182,8 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
       <div className="flex flex-col items-center px-5 pb-9 w-full bg-zinc-50 max-md:max-w-full">
         <div className="flex gap-5 justify-between self-stretch px-10 py-3 w-full border-b border-gray-200 border-solid text-neutral-900 max-md:flex-wrap max-md:px-5 max-md:max-w-full">
           <div className="flex gap-4 my-auto text-lg font-bold leading-6 whitespace-nowrap">
-            <img
+            <Image
+              alt="image"
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/7a83d6011abf080bfa320b03f7f4be5821d3903a4c089d32e4b7a09fd83acb3a?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
               className="flex-1 shrink-0 my-auto w-full aspect-square"
@@ -192,9 +193,10 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
         </div>
 
         <div className="flex overflow-hidden relative flex-col justify-end py-20 pr-6 pl-14 mt-9 w-full text-white rounded-xl max-w-[928px] min-h-[480px] max-md:px-5 max-md:max-w-full">
-          <img
+          <Image
+            alt="image"
             loading="lazy"
-            srcSet={imageUrls[0]}
+            src={imageUrls[0]}
             className="object-cover absolute inset-0 size-full"
           />
           <div className="relative mt-36 text-5xl font-black tracking-tighter leading-[60px] max-md:mt-10 max-md:max-w-full max-md:text-4xl max-md:leading-[56px]">
@@ -251,7 +253,8 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
             imageUrls.map((image, index) => (
               <div key={index} className="mt-8 flex gap-5 max-md:flex-col max-md:gap-0">
                 <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                  <img
+                  <Image
+                    alt="image"
                     loading="lazy"
                     src={image}
                     className="grow w-full aspect-[1.82] max-md:max-w-full rounded-xl"

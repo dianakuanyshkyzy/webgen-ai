@@ -3,7 +3,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
-
+import Image from "next/image";
 interface WishData {
   webData:{
   title: string;
@@ -152,7 +152,7 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
             {webData.short_paragraph}
           </p>
           <div className="mt-8">
-            <img
+            <Image
               src="https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg"
               width={1000}
               height={300}
@@ -166,7 +166,7 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
         <section className="bg-white py-12 px-4 md:px-6 lg:px-8">
           <div className="container mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <img
+              <Image
                 src={imageUrls[0]}
                 width={400}
                 height={500}
@@ -193,14 +193,14 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
                 <>
                   <div className="lg:col-span-2 lg:row-span-2">
                     <div className="grid grid-cols-2 gap-4 md:gap-6 lg:gap-8">
-                      <img
+                      <Image
                         src={imageUrls[0]}
                         alt="Gallery Image"
                         width={600}
                         height={400}
                         className="aspect-[3/2] w-full overflow-hidden rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
                       />
-                      <img
+                      <Image
                         src={imageUrls[1]}
                         alt="Gallery Image"
                         width={400}
@@ -208,7 +208,7 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
                         className="aspect-[2/3] w-full overflow-hidden rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
                       />
                       <div className="col-span-2 row-span-2 overflow-hidden rounded-lg">
-                        <img
+                        <Image
                           src={imageUrls[2]}
                           alt="Gallery Image"
                           width={1200}
@@ -225,21 +225,21 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4 md:gap-6 lg:gap-8">
-                    <img
+                    <Image
                       src={imageUrls[3]}
                       alt="Gallery Image"
                       width={400}
                       height={300}
                       className="aspect-[4/3] w-full overflow-hidden rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
                     />
-                    <img
+                    <Image
                       src={imageUrls[4]}
                       alt="Gallery Image"
                       width={300}
                       height={400}
                       className="aspect-[3/4] w-full overflow-hidden rounded-lg object-cover transition-all duration-300 group-hover:scale-105"
                     />
-                    <img
+                    <Image
                       src={imageUrls[5]}
                       alt="Gallery Image"
                       width={400}

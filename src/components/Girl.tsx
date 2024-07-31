@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import { Button } from "@/components/ui/button";
-
+import Image from 'next/image';
 interface WishData {
   webData:{
   title: string;
@@ -156,7 +156,8 @@ return (
     <div className="flex flex-col justify-between items-center px-16 pt-12 pb-4 w-full text-gray-800 bg-stone-100 max-md:px-5 max-md:max-w-full">
       <div className="flex gap-5 justify-between items-center w-full max-w-[1192px] max-md:flex-wrap max-md:max-w-full">
         <div className="flex gap-2 self-stretch my-auto text-2xl font-bold leading-6">
-          <img
+          <Image
+            alt="image"
             loading="lazy"
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/3b971d1759f903a46137417731bd1ee96e5a7fbf532739aaf967ac7b6817c468?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
             className="shrink-0 w-8 aspect-square"
@@ -186,7 +187,8 @@ return (
           </div>
         </div>
         <div className="flex flex-col ml-5 w-1/5 max-md:ml-0 max-md:w-full">
-          <img
+          <Image
+          alt="image"
             loading="lazy"
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/ba5a43fcb79ad8d3576933b7f49acbd2a36d871482760fe106c7fed3811a0bc8?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
             className="shrink-0 mt-32 max-w-full aspect-[0.48] w-[241px] max-md:mt-10"
@@ -270,7 +272,7 @@ return (
         onMouseLeave={() => {}}
       >  {imageUrls.length > 0 ? (
         imageUrls.map((image, index) => (
-          <img src={image} key={index} width={600}
+          <Image src={image} key={index} width={600} alt="image"
           height={400} className="object-cover rounded-lg aspect-video shrink-0 w-full max-w-[400px]"/>
           ))
       ) : (
@@ -319,8 +321,9 @@ return (
     <div className="pt-16 pb-10 pl-20 w-full bg-stone-100 max-md:pl-5 max-md:max-w-full">
       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
       <div className="flex flex-col ml-5 w-[21%] max-md:ml-0 max-md:w-full">
-          <img
+          <Image
             loading="lazy"
+            alt="image"
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/a3dc14860dfe559fe10bf6d4397e732b83d07d3a92f1daa9b5c966c643f54f7c?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
             className="grow shrink-0 mt-16 max-w-full aspect-[0.53] fill-fuchsia-300 w-[249px] max-md:mt-10 transform scaleX-[-1]"
           />
@@ -337,7 +340,8 @@ return (
           </div>
         </div>
         <div className="flex flex-col ml-5 w-[21%] max-md:ml-0 max-md:w-full">
-          <img
+          <Image
+          alt="image"
             loading="lazy"
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/a3dc14860dfe559fe10bf6d4397e732b83d07d3a92f1daa9b5c966c643f54f7c?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
             className="grow shrink-0 mt-16 max-w-full aspect-[0.53] fill-fuchsia-300 w-[249px] max-md:mt-10"
@@ -361,9 +365,10 @@ return (
               </div>
             </div>
             <div className="flex flex-col ml-5 w-[55%] max-md:ml-0 max-md:w-full">
-              <img
+              <Image
+              alt="image"
                 loading="lazy"
-                srcSet={imageUrls[0]}
+                src={imageUrls[0]}
                 className="z-10 grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
             </div>
@@ -372,9 +377,10 @@ return (
         <div className="mt-16 max-md:mt-10 max-md:max-w-full">
           <div className="flex gap-5 max-md:flex-col max-md:gap-0">
             <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-              <img
+              <Image
+              alt="image"
                 loading="lazy"
-                srcSet={imageUrls[1]}
+                src={imageUrls[1]}
                 className="grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
             </div>
@@ -403,9 +409,10 @@ return (
               </div>
             </div>
             <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
-              <img
+              <Image
+              alt="image"
                 loading="lazy"
-                srcSet={imageUrls[2]}
+                src={imageUrls[2]}
                 className="grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
             </div>
