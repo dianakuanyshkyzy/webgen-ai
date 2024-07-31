@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  app:
+    image: dianakuan/webgenai:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://wishgen-user:wishgen-password@postgres:5432/wishgen-db
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:14
     environment:
