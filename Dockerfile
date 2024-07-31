@@ -11,13 +11,14 @@ COPY package*.json ./
 RUN yarn install
 
 # Copy the rest of the application code
-COPY . .
+COPY .env ./
+COPY . . 
 
 # Build the Next.js application
 RUN yarn run build
 
 # Expose the port the app runs on
-EXPOSE 5432
+EXPOSE 3000
 
 # Start the application
 CMD ["yarn", "dev"]
