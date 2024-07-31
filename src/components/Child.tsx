@@ -50,31 +50,32 @@ function AnimatedImage({ src, index, total }: { src: string; index: number; tota
 
   return (
     <animated.img
-    src={src}
-    className="absolute top-1/2 left-1/2 w-24 h-24 object-cover rounded-lg"
-    style={{ transform: combinedTransform }}
-  />
+      src={src}
+      className="absolute top-1/2 left-1/2 w-24 h-24 object-cover rounded-lg"
+      style={{ transform: combinedTransform }}
+      alt={`Generated Image ${index + 1}`}
+    />
   );
 }
 
 interface WishData {
   webData: {
-  title: string;
-  recipient: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string;
-  gender: string;
-  componentType: string;
-  poemabout: string;
-}
+    title: string;
+    recipient: string;
+    about: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    paragraph: string;
+    characteristics: string[];
+    short_paragraph: string;
+    senders: string;
+    gender: string;
+    componentType: string;
+    poemabout: string;
+  }
 }
 
 interface ChildProps {
@@ -89,7 +90,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
   const [audio, setAudio] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
@@ -142,11 +143,11 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
   }, [id]);
 
   const handleNextWish = () => {
-    setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
+    setCurrentWish((prev) => (prev + 1) % webData.wishes.length);
   };
 
   const handlePrevWish = () => {
-    setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
+    setCurrentWish((prev) => (prev - 1 + webData.wishes.length) % webData.wishes.length);
   };
 
   useEffect(() => {
@@ -170,14 +171,12 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
 
   const handleSurpriseClick = async () => {
     try {
-      // Check if audio already exists in S3
       const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
         setAudio(audioData.audio[0] || null);
       } else {
-        // Generate audio if it doesn't exist
         const generateResponse = await fetch("/api/generate-songs", {
           method: "POST",
           headers: {
@@ -202,7 +201,6 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
       console.error("Error fetching or generating audio:", error);
     }
   };
-    
 
   return (
     <div className="flex flex-col min-h-dvh bg-[#f0f8ff] text-foreground">
@@ -223,7 +221,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
           </div>
           <div className="flex flex-col items-center justify-center space-y-4">
             {imageUrls.length > 0 && (
-              <img
+              <Image
                 src={imageUrls[0]}
                 width={600}
                 height={600}
@@ -265,7 +263,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
             <CardHeader>
               <CardTitle>Birthday wishes for {webData.recipient}</CardTitle>
               <CardDescription>
-                Inspiring and heartfelt wishes to celebrate {webData.recipient}'s
+                Inspiring and heartfelt wishes to celebrate {webData.recipient}&apos;s
                 special day.
               </CardDescription>
             </CardHeader>
@@ -294,7 +292,6 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
               {webData.hobbies.map((fact, index) => (
                 <div key={index} className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-blue-100">
-                    {/* You can dynamically switch icons here based on the fact type */}
                     {index === 0 && <CakeIcon className="h-6 w-6" />}
                     {index === 1 && <FlowerIcon className="h-6 w-6" />}
                     {index === 2 && <PaletteIcon className="h-6 w-6" />}
@@ -302,8 +299,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
                   </div>
                   <div>
                     <div className="font-medium">{fact}</div>
-                    <div className="text-sm text-blue-900/80">
-                    </div>
+                    <div className="text-sm text-blue-900/80"></div>
                   </div>
                 </div>
               ))}
@@ -351,7 +347,6 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
             </h3>
             <p className="mb-4 text-yellow-800"></p>
             <Button
-             
               className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
               onClick={handleSurpriseClick}
             >
@@ -373,6 +368,3 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
 };
 
 export default Child;
-
-
-

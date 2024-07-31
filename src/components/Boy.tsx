@@ -1,33 +1,33 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import React, { useState, useEffect } from 'react';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSpring, animated } from 'react-spring';
+import Image from 'next/image';
 
 interface WishData {
-  webData:{
-  title: string;
-  recipient: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string;
-  gender: string;
-  componentType:string; 
-  poemabout: string;
-}
+  webData: {
+    title: string;
+    recipient: string;
+    about: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    paragraph: string;
+    characteristics: string[];
+    short_paragraph: string;
+    senders: string;
+    gender: string;
+    componentType: string;
+    poemabout: string;
+  }
 }
 
 interface BoyfriendProps {
   wishData: WishData;
   id: string;
 }
-
 
 const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
   const { webData } = wishData;
@@ -36,7 +36,7 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
   const [audio, setAudio] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
@@ -88,17 +88,14 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
     }
   }, [id]);
 
-  
   const handleSurpriseClick = async () => {
     try {
-      // Check if audio already exists in S3
       const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
         setAudio(audioData.audio[0] || null);
       } else {
-        // Generate audio if it doesn't exist
         const generateResponse = await fetch("/api/generate-songs", {
           method: "POST",
           headers: {
@@ -123,10 +120,7 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
       console.error("Error fetching or generating audio:", error);
     }
   };
- 
-  
-  console.log(wishData); 
-   
+
   return (
     <div className="flex min-h-screen flex-col bg-[url('/background.jpg')] bg-cover bg-center bg-no-repeat">
       <header className="sticky top-0 z-10 bg-[#1f2937] py-4">
@@ -169,37 +163,34 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
         </section>
         <section id="memories" className="bg-[#1f2937] py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="mb-8 text-3xl font-bold text-[#f5f5f5]">Memories We've Shared</h2>
+            <h2 className="mb-8 text-3xl font-bold text-[#f5f5f5]">Memories We&apos;ve Shared</h2>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {
               imageUrls.length > 0 ? imageUrls.map((image, index) => (
                 <div key={index} className="rounded-lg bg-[#374151] p-6 shadow-lg">
-                  <img src={image} alt={`Memory ${index + 1}`} className="mb-4 rounded-lg" />
+                  <Image src={image} alt={`Memory ${index + 1}`} className="mb-4 rounded-lg" width={500} height={500} />
                 </div>
               )) : (
                 <div className="text-[#d1d5db]">No memories available</div>
-              )
-              }
-               {videos.length > 0 ? (
-      videos.map((video, index) => (
-        <div key={index} className="rounded-lg bg-[#374151] p-6 shadow-lg">
-          <video
-            src={video}
-            controls
-            className="mb-4 rounded-lg"
-            width="100%"
-            height="auto"
-          >
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      ))
-    ) : (
-      <div className="text-[#d1d5db]">No memories available</div>
-    )}
-              
+              )}
+              {videos.length > 0 ? (
+                videos.map((video, index) => (
+                  <div key={index} className="rounded-lg bg-[#374151] p-6 shadow-lg">
+                    <video
+                      src={video}
+                      controls
+                      className="mb-4 rounded-lg"
+                      width="100%"
+                      height="auto"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                ))
+              ) : (
+                <div className="text-[#d1d5db]">No memories available</div>
+              )}
             </div>
-            
           </div>
         </section>
         <section id="facts" className="bg-[#1f2937] py-16">
@@ -224,19 +215,19 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
                 As a special birthday surprise, click this button to listen to a song written just for you.
               </p>
               <Button
-              className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
-              onClick={handleSurpriseClick}
-            >
-              Click me!
-            </Button>
-            {audio && (
-              <div className="mt-4">
-                <audio controls>
-                  <source src={audio} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-            )}
+                className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
+                onClick={handleSurpriseClick}
+              >
+                Click me!
+              </Button>
+              {audio && (
+                <div className="mt-4">
+                  <audio controls>
+                    <source src={audio} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -261,8 +252,8 @@ const Boyfriend: React.FC<BoyfriendProps> = ({ wishData, id }) => {
         </div>
       </footer>
     </div>
-  )
-}
+  );
+};
 
 function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -282,28 +273,7 @@ function MenuIcon(props: React.SVGProps<SVGSVGElement>) {
       <line x1="4" x2="20" y1="6" y2="6" />
       <line x1="4" x2="20" y1="18" y2="18" />
     </svg>
-  )
-}
-
-
-function XIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  )
+  );
 }
 
 export default Boyfriend;

@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './ui/button';
+import Image from 'next/image';
+
 interface WishData {
-  webData:{
-  title: string;
-  recipient: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string;
-  }
+  webData: {
+    title: string;
+    recipient: string;
+    about: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    paragraph: string;
+    characteristics: string[];
+    short_paragraph: string;
+    senders: string;
+  };
 }
 
 interface DadHomePageProps {
@@ -27,9 +29,8 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
   const [audio, setAudio] = useState<string | null>(null);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
@@ -53,12 +54,12 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
       try {
         const imageResponse = await fetch(`/api/s3-images?id=${id}`);
         if (!imageResponse.ok) {
-          throw new Error("Failed to fetch images");
+          throw new Error('Failed to fetch images');
         }
         const imageData = await imageResponse.json();
         setImages(imageData.images || []);
       } catch (error) {
-        console.error("Error fetching images:", error);
+        console.error('Error fetching images:', error);
       }
     };
 
@@ -66,12 +67,12 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
       try {
         const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
         if (!videoResponse.ok) {
-          throw new Error("Failed to fetch videos");
+          throw new Error('Failed to fetch videos');
         }
         const videoData = await videoResponse.json();
         setVideos(videoData.videos || []);
       } catch (error) {
-        console.error("Error fetching videos:", error);
+        console.error('Error fetching videos:', error);
       }
     };
 
@@ -82,11 +83,11 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
   }, [id]);
 
   const handleNextWish = () => {
-    setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
+    setCurrentWish((prev) => (prev + 1) % webData.wishes.length);
   };
 
   const handlePrevWish = () => {
-    setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
+    setCurrentWish((prev) => (prev - 1 + webData.wishes.length) % webData.wishes.length);
   };
 
   useEffect(() => {
@@ -104,16 +105,15 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
     try {
       // Check if audio already exists in S3
       const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
-
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
         setAudio(audioData.audio[0] || null);
       } else {
         // Generate audio if it doesn't exist
-        const generateResponse = await fetch("/api/generate-songs", {
-          method: "POST",
+        const generateResponse = await fetch('/api/generate-songs', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             prompt: webData.recipient,
@@ -127,27 +127,44 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
           setAudio(data.audio_url);
         } else {
           const errorData = await generateResponse.json();
-          console.error("Error generating audio:", errorData.error);
+          console.error('Error generating audio:', errorData.error);
         }
       }
     } catch (error) {
-      console.error("Error fetching or generating audio:", error);
+      console.error('Error fetching or generating audio:', error);
     }
   };
-  
+
   return (
     <div className="dad-home-page font-sans bg-orange-200 text-brown-800">
       <header className="header flex justify-between items-center p-4 bg-white border-b border-orange-100">
         <div className="logo text-2xl font-bold">WishAI</div>
         <nav className="nav space-x-4">
-          <a href="#about" className="text-brown-800 no-underline">About</a>
-          <a href="#gallery" className="text-brown-800 no-underline">Gallery</a>
-          <a href="#video" className="text-brown-800 no-underline">Video Message</a>
-          <a href="#poems" className="text-brown-800 no-underline">Poems</a>
-          <a href="#wishes" className="text-brown-800 no-underline">Wishes</a>
+          <a href="#about" className="text-brown-800 no-underline">
+            About
+          </a>
+          <a href="#gallery" className="text-brown-800 no-underline">
+            Gallery
+          </a>
+          <a href="#video" className="text-brown-800 no-underline">
+            Video Message
+          </a>
+          <a href="#poems" className="text-brown-800 no-underline">
+            Poems
+          </a>
+          <a href="#wishes" className="text-brown-800 no-underline">
+            Wishes
+          </a>
         </nav>
       </header>
-      <section className="hero text-center py-20 text-white" style={{ backgroundImage: `url(${webData.images?.[0] || ''})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <section
+        className="hero text-center py-20 text-white"
+        style={{
+          backgroundImage: `url(${webData.images?.[0] || ''})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         <h1 className="text-4xl">{webData.title}</h1>
         <h2 className="text-2xl">{webData.short_paragraph}</h2>
       </section>
@@ -155,7 +172,7 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
         <h2 className="text-3xl">About {webData.recipient}</h2>
         <p className="my-4">{webData.about}</p>
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {webData.hobbies?.map((hobby:string, index:number) => (
+          {webData.hobbies?.map((hobby: string, index: number) => (
             <div className="card bg-white border border-orange-100 rounded-lg p-4" key={index}>
               <div className="icon">⭐</div>
               <h3 className="text-xl">{hobby}</h3>
@@ -168,8 +185,16 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {imageUrls.length > 0 ? (
             imageUrls.map((image, index) => (
-              <img src={image}></img>
-              ))
+              <Image
+                key={index}
+                src={image}
+                alt={`Memory ${index + 1}`}
+                className="rounded-lg"
+                width={300}
+                height={300}
+                objectFit="cover"
+              />
+            ))
           ) : (
             <p>No images available</p>
           )}
@@ -199,11 +224,10 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
       </section>
       <section id="wishes" className="wishes py-8 text-center">
         <h2 className="text-3xl">Wishes</h2>
-        {webData.wishes?.map((wish:string, index:number) => (
+        {webData.wishes?.map((wish: string, index: number) => (
           <div className="wish-item bg-white border border-orange-100 rounded-lg p-4 my-4" key={index}>
             <p>{wish}</p>
           </div>
-
         ))}
       </section>
       <footer className="footer py-8 bg-orange-50">
@@ -214,21 +238,17 @@ const DadHomePage: React.FC<DadHomePageProps> = ({ wishData, id }) => {
             <p>{webData.senders?.split('\n')[1]}</p>
           </div>
         </div>
-        <Button
-             
-              className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
-              onClick={handleSurpriseClick}
-            >
-              Click me!
-            </Button>
-            {audio && (
-              <div className="mt-4">
-                <audio controls>
-                  <source src={audio} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-            )}
+        <Button className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]" onClick={handleSurpriseClick}>
+          Click me!
+        </Button>
+        {audio && (
+          <div className="mt-4">
+            <audio controls>
+              <source src={audio} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        )}
       </footer>
     </div>
   );

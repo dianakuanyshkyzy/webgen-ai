@@ -12,31 +12,33 @@ import ThankYou from '@/components/Thankyou';
 import GetWell from '@/components/GetWell';
 import Invitation from '@/components/Invitation';
 import Graduation from '@/components/Graduation';
+
 interface WishData {
-  webData:{
-  title: string;
-  about: string;
-  paragraph: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  short_paragraph: string;
-  characteristics: string[];
-  facts: string[];
-  senders: string;
-  componentType: string;
-  poemabout: string;
-  gender: string;
-  description: string;
-  recipient: string;
-  eventDate: string;
-}
+  webData: {
+    title: string;
+    about: string;
+    paragraph: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    short_paragraph: string;
+    characteristics: string[];
+    facts: string[];
+    senders: string;
+    componentType: string;
+    poemabout: string;
+    gender: string;
+    description: string;
+    recipient: string;
+    eventDate: string;
+  };
 }
 
 const GiftCardPage: React.FC = () => {
-  const { id } = useParams();
+  const params = useParams();
+  const id = (Array.isArray(params.id) ? params.id[0] : params.id) as string; // Ensure id is a string
   const [wishJsonData, setWishJsonData] = useState<{ wishData?: WishData } | null>(null);
 
   useEffect(() => {
@@ -52,39 +54,40 @@ const GiftCardPage: React.FC = () => {
       }
     };
     fetchWishData();
-  }, [id]);
+  }, [id]); // Ensure id is in the dependency array
+
+  const renderComponent = () => {
+    if (!wishJsonData?.wishData) {
+      return null;
+    }
+
+    const { componentType } = wishJsonData.wishData.webData;
+
+    switch (componentType) {
+      case 'girl':
+        return <Girlfriend wishData={wishJsonData.wishData} id={id} />;
+      case 'boy':
+        return <Boyfriend wishData={wishJsonData.wishData} id={id} />;
+      case 'child':
+        return <Child wishData={wishJsonData.wishData} id={id} />;
+      case 'anniversary':
+        return <Anniversary wishData={wishJsonData.wishData} id={id} />;
+      case 'thank_you':
+        return <ThankYou wishData={wishJsonData.wishData} id={id} />;
+      case 'get_well':
+        return <GetWell wishData={wishJsonData.wishData} id={id} />;
+      case 'invitation':
+        return <Invitation wishData={wishJsonData.wishData} id={id} />;
+      case 'graduation':
+        return <Graduation wishData={wishJsonData.wishData} id={id} />;
+      default:
+        return null;
+    }
+  };
 
   return (
-
     <div>
-      
-      {wishJsonData ? (
-        <>
-          {wishJsonData.wishData?.webData?.componentType === 'girl' ? (
-            <Girlfriend wishData={wishJsonData.wishData} id={id} />
-          ) : wishJsonData.wishData?.webData?.componentType === 'boy' ? (
-            <Boyfriend wishData={wishJsonData.wishData} id={id} />
-          ) : wishJsonData.wishData?.webData?.componentType === 'child' ? (
-            <Child wishData={wishJsonData.wishData} id={id} />
-          ): wishJsonData.wishData?.webData?.componentType === 'anniversary' ? (
-            <Anniversary wishData={wishJsonData.wishData} id={id} />
-          ):wishJsonData.wishData?.webData?.componentType === 'thank_you' ? (
-            <ThankYou wishData={wishJsonData.wishData} id={id} />
-          ):
-          wishJsonData.wishData?.webData?.componentType === 'get_well' ? (
-            <GetWell wishData={wishJsonData.wishData} id={id} />
-          ):
-          wishJsonData.wishData?.webData?.componentType === 'invitation' ? (
-            <Invitation wishData={wishJsonData.wishData} id={id} />
-          ):
-          wishJsonData.wishData?.webData?.componentType === 'graduation' ? (
-            <Graduation wishData={wishJsonData.wishData} id={id} />
-          ):
-           null}
-        </>
-      ) : (
-        <div>Loading...</div>
-      )} 
+      {wishJsonData ? renderComponent() : <div>Loading...</div>}
     </div>
   );
 };

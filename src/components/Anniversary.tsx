@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSpring, animated } from 'react-spring';
+import Image from 'next/image';
 import Countdown from './ui/countdown';
 
 interface WishData {
-  webData:{
-  title: string;
-  recipient: string;
-  eventDate: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string;
-  gender: string;
-  componentType: string;
-  poemabout: string;
-}
+  webData: {
+    title: string;
+    recipient: string;
+    eventDate: string;
+    about: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    paragraph: string;
+    characteristics: string[];
+    short_paragraph: string;
+    senders: string;
+    gender: string;
+    componentType: string;
+    poemabout: string;
+  };
 }
 
 interface AnniversaryProps {
@@ -35,7 +36,7 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
   const [audio, setAudio] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
@@ -59,12 +60,12 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
       try {
         const imageResponse = await fetch(`/api/s3-images?id=${id}`);
         if (!imageResponse.ok) {
-          throw new Error("Failed to fetch images");
+          throw new Error('Failed to fetch images');
         }
         const imageData = await imageResponse.json();
         setImages(imageData.images || []);
       } catch (error) {
-        console.error("Error fetching images:", error);
+        console.error('Error fetching images:', error);
       }
     };
 
@@ -72,12 +73,12 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
       try {
         const videoResponse = await fetch(`/api/s3-videos?id=${id}`);
         if (!videoResponse.ok) {
-          throw new Error("Failed to fetch videos");
+          throw new Error('Failed to fetch videos');
         }
         const videoData = await videoResponse.json();
         setVideos(videoData.videos || []);
       } catch (error) {
-        console.error("Error fetching videos:", error);
+        console.error('Error fetching videos:', error);
       }
     };
 
@@ -89,18 +90,16 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
 
   const handleSurpriseClick = async () => {
     try {
-      // Check if audio already exists in S3
       const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
         setAudio(audioData.audio[0] || null);
       } else {
-        // Generate audio if it doesn't exist
-        const generateResponse = await fetch("/api/generate-songs", {
-          method: "POST",
+        const generateResponse = await fetch('/api/generate-songs', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             prompt: webData.recipient,
@@ -114,32 +113,32 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
           setAudio(data.audio_url);
         } else {
           const errorData = await generateResponse.json();
-          console.error("Error generating audio:", errorData.error);
+          console.error('Error generating audio:', errorData.error);
         }
       }
     } catch (error) {
-      console.error("Error fetching or generating audio:", error);
+      console.error('Error fetching or generating audio:', error);
     }
   };
 
   const handleGenerateDescriptions = async () => {
     try {
-      const response = await fetch("/api/generate-description", {
-        method: "POST",
+      const response = await fetch('/api/generate-description', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ id }),
       });
 
       const data = await response.json();
-      console.log("Response received from generate-description:", response);
+      console.log('Response received from generate-description:', response);
 
       if (response.ok) {
-        const descriptionResponse = await fetch("/api/generate-cute-photos", {
-          method: "POST",
+        const descriptionResponse = await fetch('/api/generate-cute-photos', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({ descriptions: data.descriptions, id }),
         });
@@ -148,33 +147,33 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
         if (descriptionResponse.ok) {
           setGeneratedImages(generatedData.generatedImages);
         } else {
-          console.error("Error generating cute photos:", generatedData.error);
+          console.error('Error generating cute photos:', generatedData.error);
         }
       } else {
-        console.error("Error generating descriptions:", data.error);
+        console.error('Error generating descriptions:', data.error);
       }
     } catch (error: any) {
-      console.error("Error generating descriptions:", error.message);
+      console.error('Error generating descriptions:', error.message);
     }
   };
 
-  const handleNextWish = () => {
-    setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
-  };
+  const handleNextWish = useCallback(() => {
+    setCurrentWish((prev) => (prev + 1) % webData.wishes.length);
+  }, [webData.wishes.length]);
 
   const handlePrevWish = () => {
-    setCurrentWish((prev) => (prev - 1 + webData?.wishes.length) % webData.wishes.length);
+    setCurrentWish((prev) => (prev - 1 + webData.wishes.length) % webData.wishes.length);
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
       handleNextWish();
     }, 5000);
-    return () => clearInterval(interval); // Cleanup the interval on component unmount
-  }, [webData.wishes.length]);
+    return () => clearInterval(interval);
+  }, [handleNextWish]);
 
   if (!webData) {
-    return <div>Loading...</div>; // Adjust this to your preferred loading state
+    return <div>Loading...</div>;
   }
 
   return (
@@ -182,20 +181,25 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
       <div className="flex flex-col items-center px-5 pb-9 w-full bg-zinc-50 max-md:max-w-full">
         <div className="flex gap-5 justify-between self-stretch px-10 py-3 w-full border-b border-gray-200 border-solid text-neutral-900 max-md:flex-wrap max-md:px-5 max-md:max-w-full">
           <div className="flex gap-4 my-auto text-lg font-bold leading-6 whitespace-nowrap">
-            <img
+            <Image
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/7a83d6011abf080bfa320b03f7f4be5821d3903a4c089d32e4b7a09fd83acb3a?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
               className="flex-1 shrink-0 my-auto w-full aspect-square"
+              alt="WebGenAI Logo"
+              width={32}
+              height={32}
             />
             <div>WebGenAI</div>
           </div>
         </div>
 
         <div className="flex overflow-hidden relative flex-col justify-end py-20 pr-6 pl-14 mt-9 w-full text-white rounded-xl max-w-[928px] min-h-[480px] max-md:px-5 max-md:max-w-full">
-          <img
+          <Image
             loading="lazy"
-            srcSet={imageUrls[0]}
+            src={imageUrls[0]}
             className="object-cover absolute inset-0 size-full"
+            alt="Memory"
+            layout="fill"
           />
           <div className="relative mt-36 text-5xl font-black tracking-tighter leading-[60px] max-md:mt-10 max-md:max-w-full max-md:text-4xl max-md:leading-[56px]">
             {webData.title}
@@ -251,10 +255,13 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
             imageUrls.map((image, index) => (
               <div key={index} className="mt-8 flex gap-5 max-md:flex-col max-md:gap-0">
                 <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
-                  <img
+                  <Image
                     loading="lazy"
                     src={image}
                     className="grow w-full aspect-[1.82] max-md:max-w-full rounded-xl"
+                    alt={`Memory ${index + 1}`}
+                    width={500}
+                    height={273}
                   />
                 </div>
                 <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
@@ -285,7 +292,7 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
                     src={video}
                     controls
                     className="grow w-full aspect-[1.82] max-md:max-w-full rounded-xl"
-                  />р
+                  />
                 </div>
                 <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
                   <div className="flex flex-col justify-center p-4 leading-[150%] text-stone-500 max-md:max-w-full">
@@ -296,7 +303,7 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
                       Share a message with the couple
                     </div>
                     <div className="mt-1 text-base max-md:max-w-full">
-                      We can't wait to celebrate with you!
+                      We can&apos;t wait to celebrate with you!
                     </div>
                   </div>
                 </div>

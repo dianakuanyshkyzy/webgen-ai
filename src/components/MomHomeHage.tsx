@@ -1,21 +1,22 @@
 import party from 'party-js';
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface WishData {
-  webData:{
-  title: string;
-  recipient: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string;
-}
+  webData: {
+    title: string;
+    recipient: string;
+    about: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    paragraph: string;
+    characteristics: string[];
+    short_paragraph: string;
+    senders: string;
+  };
 }
 
 interface MomHomePageProps {
@@ -28,9 +29,8 @@ const MomHomePage: React.FC<MomHomePageProps> = ({ wishData, id }) => {
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
   const [audio, setAudio] = useState<string | null>(null);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
@@ -101,17 +101,13 @@ const MomHomePage: React.FC<MomHomePageProps> = ({ wishData, id }) => {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
 
-
   const handleSurpriseClick = async () => {
     try {
-      // Check if audio already exists in S3
       const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
-
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
         setAudio(audioData.audio[0] || null);
       } else {
-        // Generate audio if it doesn't exist
         const generateResponse = await fetch("/api/generate-songs", {
           method: "POST",
           headers: {
@@ -144,79 +140,69 @@ const MomHomePage: React.FC<MomHomePageProps> = ({ wishData, id }) => {
   }, []);
 
   return (
-    <>
-      <head>
-        <title>WebGenAI</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/party-js/1.0.0/party.min.js"></script>
-      </head>
-      <body className="font-sans bg-orange-200 text-brown-800">
-        <div className="confetti"></div>
-        <div className="party-pals">
-          <header className="header flex justify-between items-center p-4 bg-white border-b border-orange-100">
-            <div className="logo text-2xl font-bold">WebGenAI</div>
-            <nav className="nav space-x-4">
-              <a href="#welcome" className="text-brown-800 no-underline">About</a>
-              <a href="#fun-memories" className="text-brown-800 no-underline">Fun Memories</a>
-              <a href="#celebrate" className="text-brown-800 no-underline">Celebrate</a>
-            </nav>
-          </header>
+    <div className="font-sans bg-orange-200 text-brown-800">
+      <header className="header flex justify-between items-center p-4 bg-white border-b border-orange-100">
+        <div className="logo text-2xl font-bold">WebGenAI</div>
+        <nav className="nav space-x-4">
+          <a href="#welcome" className="text-brown-800 no-underline">About</a>
+          <a href="#fun-memories" className="text-brown-800 no-underline">Fun Memories</a>
+          <a href="#celebrate" className="text-brown-800 no-underline">Celebrate</a>
+        </nav>
+      </header>
 
-          <section id="welcome" className="hero text-center py-20 text-white" style={{ backgroundColor: '#f90' }}>
-            <h1 className="text-4xl">{webData.recipient}!</h1>
-            <p>{webData.title}</p>
-            <div className="party-started bg-white text-brown-800 p-8 rounded-lg m-auto max-w-xl mt-8">
-              <h2 className="text-3xl">{webData.short_paragraph}</h2>
-              <p>{webData.paragraph}</p>
-              <div className="images flex justify-center gap-8 mt-8">
-                <img src={imageUrls[0]} alt="Balloons" className="w-24 h-24" />
-                <img src={imageUrls[1]} alt="Confetti" className="w-24 h-24" />
-              </div>
-            </div>
-          </section>
-
-          <section id="fun-memories" className="fun-memories py-8 text-center">
-            <h2 className="text-3xl">Fun Memories</h2>
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {imageUrls.map((image, index) => (
-                <div key={index} className="memory bg-white border border-orange-100 rounded-lg p-4">
-                  <img src={image} alt={`Memory ${index + 1}`} className="w-full h-40 object-cover rounded-lg" />
-                  <p className="mt-2">{webData.wishes[index]}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section id="celebrate" className="celebrate py-8 text-center bg-orange-500 text-white">
-            <h2 className="text-3xl">Celebrate with {webData.recipient}!</h2>
-            <div className="birthday-wishes bg-white text-brown-800 p-8 rounded-lg m-auto max-w-xl mt-8">
-              <h3 className="text-2xl">Birthday Wishes</h3>
-              <ul className="list-none p-0 text-black">
-                {webData.wishes.map((wish, index) => (
-                  <li key={index} className="bg-gray-50 border border-orange-100 rounded-lg p-4 my-2">
-                    {wish}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <button 
-              className="bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors duration-300 mt-8"
-              onClick={handleSurpriseClick}
-            >
-              Open Song
-            </button>
-            {audio && (
-              <div className="mt-4">
-                <audio controls>
-                  <source src={audio} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-            )}
-          </section>
+      <section id="welcome" className="hero text-center py-20 text-white" style={{ backgroundColor: '#f90' }}>
+        <h1 className="text-4xl">{webData.recipient}!</h1>
+        <p>{webData.title}</p>
+        <div className="party-started bg-white text-brown-800 p-8 rounded-lg m-auto max-w-xl mt-8">
+          <h2 className="text-3xl">{webData.short_paragraph}</h2>
+          <p>{webData.paragraph}</p>
+          <div className="images flex justify-center gap-8 mt-8">
+            <Image src={imageUrls[0]} alt="Balloons" width={96} height={96} className="w-24 h-24" />
+            <Image src={imageUrls[1]} alt="Confetti" width={96} height={96} className="w-24 h-24" />
+          </div>
         </div>
-      </body>
-    </>
+      </section>
+
+      <section id="fun-memories" className="fun-memories py-8 text-center">
+        <h2 className="text-3xl">Fun Memories</h2>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {imageUrls.map((image, index) => (
+            <div key={index} className="memory bg-white border border-orange-100 rounded-lg p-4">
+              <Image src={image} alt={`Memory ${index + 1}`} width={160} height={160} className="w-full h-40 object-cover rounded-lg" />
+              <p className="mt-2">{webData.wishes[index]}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="celebrate" className="celebrate py-8 text-center bg-orange-500 text-white">
+        <h2 className="text-3xl">Celebrate with {webData.recipient}!</h2>
+        <div className="birthday-wishes bg-white text-brown-800 p-8 rounded-lg m-auto max-w-xl mt-8">
+          <h3 className="text-2xl">Birthday Wishes</h3>
+          <ul className="list-none p-0 text-black">
+            {webData.wishes.map((wish, index) => (
+              <li key={index} className="bg-gray-50 border border-orange-100 rounded-lg p-4 my-2">
+                {wish}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <button
+          className="bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors duration-300 mt-8"
+          onClick={handleSurpriseClick}
+        >
+          Open Song
+        </button>
+        {audio && (
+          <div className="mt-4">
+            <audio controls>
+              <source src={audio} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        )}
+      </section>
+    </div>
   );
 };
 
