@@ -156,12 +156,7 @@ return (
     <div className="flex flex-col justify-between items-center px-16 pt-12 pb-4 w-full text-gray-800 bg-stone-100 max-md:px-5 max-md:max-w-full">
       <div className="flex gap-5 justify-between items-center w-full max-w-[1192px] max-md:flex-wrap max-md:max-w-full">
         <div className="flex gap-2 self-stretch my-auto text-2xl font-bold leading-6">
-          <Image
-            alt="image"
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/3b971d1759f903a46137417731bd1ee96e5a7fbf532739aaf967ac7b6817c468?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
-            className="shrink-0 w-8 aspect-square"
-          />
+          
           <div className="my-auto">WebGenAI</div>
         </div>
         <div className="flex gap-5 justify-between self-stretch my-auto text-xl font-medium leading-6 max-md:flex-wrap">
@@ -174,6 +169,7 @@ return (
         
       </div>
     </div>
+    
     <div className="z-10 justify-center py-20 pl-20 w-full bg-stone-100 max-md:pl-5 max-md:max-w-full">
       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
         <div className="flex flex-col w-4/5 max-md:ml-0 max-md:w-full">
@@ -187,13 +183,22 @@ return (
           </div>
         </div>
         <div className="flex flex-col ml-5 w-1/5 max-md:ml-0 max-md:w-full">
-          <Image
-          alt="image"
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/ba5a43fcb79ad8d3576933b7f49acbd2a36d871482760fe106c7fed3811a0bc8?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
-            className="shrink-0 mt-32 max-w-full aspect-[0.48] w-[241px] max-md:mt-10"
-          />
-        </div>
+  <div
+    className="shrink-0 mt-32 max-w-full aspect-[0.48] w-[241px] max-md:mt-10"
+    style={{
+      backgroundImage: 'url("https://cdn.builder.io/api/v1/image/assets/TEMP/ba5a43fcb79ad8d3576933b7f49acbd2a36d871482760fe106c7fed3811a0bc8?apiKey=74627f4a04b34f4c896e1b7417ba3997&")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      width: '440.49px',
+      height: '804.04px',
+      position: 'absolute',
+      left: '-142px',
+      top: '5px',
+      zIndex: 4,
+    }}
+  />
+</div>
+
       </div>
     </div>
     <div id="wishes-section" className=" flex justify-center items-center px-16 py-16 w-full bg-stone-100 max-md:px-5 max-md:max-w-full">
@@ -320,14 +325,23 @@ return (
 
     <div className="pt-16 pb-10 pl-20 w-full bg-stone-100 max-md:pl-5 max-md:max-w-full">
       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
-      <div className="flex flex-col ml-5 w-[21%] max-md:ml-0 max-md:w-full">
-          <Image
-            loading="lazy"
-            alt="image"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/a3dc14860dfe559fe10bf6d4397e732b83d07d3a92f1daa9b5c966c643f54f7c?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
-            className="grow shrink-0 mt-16 max-w-full aspect-[0.53] fill-fuchsia-300 w-[249px] max-md:mt-10 transform scaleX-[-1]"
-          />
-        </div>
+      <div className="flex flex-col ml-5 w-1/5 max-md:ml-0 max-md:w-full">
+  <div
+    className="shrink-0 mt-32 max-w-full aspect-[0.48] w-[241px] max-md:mt-10"
+    style={{
+      backgroundImage: 'url("https://cdn.builder.io/api/v1/image/assets/TEMP/ba5a43fcb79ad8d3576933b7f49acbd2a36d871482760fe106c7fed3811a0bc8?apiKey=74627f4a04b34f4c896e1b7417ba3997&")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      width: '440.49px',
+      height: '804.04px',
+      position: 'absolute',
+      left: '-142px',
+      top: '5px',
+      zIndex: 4,
+    }}
+  />
+</div>
+
         <div id="facts-section"className="flex flex-col w-[79%] max-md:ml-0 max-md:w-full">
           <div className="flex flex-col font-bold text-center text-gray-800 max-md:mt-10 max-md:max-w-full">
             <div className="text-6xl max-md:max-w-full max-md:text-4xl">
@@ -340,12 +354,23 @@ return (
           </div>
         </div>
         <div className="flex flex-col ml-5 w-[21%] max-md:ml-0 max-md:w-full">
-          <Image
-          alt="image"
-            loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/a3dc14860dfe559fe10bf6d4397e732b83d07d3a92f1daa9b5c966c643f54f7c?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
-            className="grow shrink-0 mt-16 max-w-full aspect-[0.53] fill-fuchsia-300 w-[249px] max-md:mt-10"
-          />
+        <div className="flex flex-col ml-5 w-1/5 max-md:ml-0 max-md:w-full">
+  <div
+    className="shrink-0 mt-32 max-w-full aspect-[0.48] w-[241px] max-md:mt-10"
+    style={{
+      backgroundImage: 'url("https://cdn.builder.io/api/v1/image/assets/TEMP/ba5a43fcb79ad8d3576933b7f49acbd2a36d871482760fe106c7fed3811a0bc8?apiKey=74627f4a04b34f4c896e1b7417ba3997&")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      width: '440.49px',
+      height: '804.04px',
+      position: 'absolute',
+      left: '-142px',
+      top: '5px',
+      zIndex: 4,
+    }}
+  />
+</div>
+
         </div>
       </div>
     </div>
