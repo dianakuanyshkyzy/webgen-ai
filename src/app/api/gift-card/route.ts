@@ -67,7 +67,7 @@ export async function POST(request: Request) {
       data: {
         wishData: JSON.parse(gptResponse),
       },
-    });
+    });`  `
 
     return new Response(
       JSON.stringify({ url: `http://localhost:3000/${id}`, id}),
