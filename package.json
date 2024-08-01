@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate"
-    
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.613.0",
@@ -24,6 +23,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@react-spring/web": "^9.7.3",
     "@supabase/supabase-js": "^2.44.2",
+    "@vercel/postgres": "^0.9.0",
     "ai": "^3.2.16",
     "aws-sdk": "^2.1654.0",
     "axios": "^1.7.2",
