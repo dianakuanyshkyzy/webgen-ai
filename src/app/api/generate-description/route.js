@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { S3Client, GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { OpenAI } from 'openai';
 import { Readable } from 'stream';
-
+export const maxDuration = 60 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {

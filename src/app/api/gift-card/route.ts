@@ -1,6 +1,9 @@
 import prisma from '@/lib/db';
 import askGpt from '@/lib/openai';
 
+export const maxDuration = 60
+// max up to 60 secs
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
