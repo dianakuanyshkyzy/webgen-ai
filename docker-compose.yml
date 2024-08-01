@@ -23,7 +23,7 @@ services:
   postgres:
     image: postgres:14
     environment:
-      POSTGRES_DB: verceldb
+      POSTGRES_DB: wishgen-db
       POSTGRES_USER: default
       POSTGRES_PASSWORD: pWV4BT0mYrxw
     volumes:
