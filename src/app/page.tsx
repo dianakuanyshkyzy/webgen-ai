@@ -120,7 +120,7 @@ export default function Component() {
       console.error('Error generating images:', error.message);
     }
   };
-
+  
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-indigo-500 px-4 py-12 sm:px-6 lg:px-8 text-white">
       <div className="max-w-md w-full space-y-8">

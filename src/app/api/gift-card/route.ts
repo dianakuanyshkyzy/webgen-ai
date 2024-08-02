@@ -1,19 +1,22 @@
-import prisma from '@/lib/db';
-import askGpt from '@/lib/openai';
+import prisma from "@/lib/db";
+import askGpt from "@/lib/openai";
 
-export const maxDuration = 60
+export const maxDuration = 60;
 // max up to 60 secs
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const context = formData.get('context')?.toString();
-    
+    const context = formData.get("context")?.toString();
+
     if (!context) {
-      return new Response(JSON.stringify({ error: 'Missing context parameter' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: "Missing context parameter" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     const prompt = `You are the most professional gift text generator, your words always make people cry.
@@ -62,30 +65,30 @@ export async function POST(request: Request) {
     const gptResponse = await askGpt(prompt);
 
     if (!gptResponse) {
-      throw new Error('Failed to generate response from GPT');
+      throw new Error("Failed to generate response from GPT");
     }
 
-    console.log('GPT response:', gptResponse); 
-      const { id } = await prisma.wish.create({
+    console.log("GPT response:", gptResponse);
+    const { id } = await prisma.wish.create({
       data: {
         wishData: JSON.parse(gptResponse),
       },
-    });`  `
+    });
 
     return new Response(
-      JSON.stringify({ url: `http://localhost:3000/${id}`, id}),
+      JSON.stringify({ url: `http://localhost:3000/${id}`, id }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   } catch (error: any) {
-    console.error('Server error:', error);
+    console.error("Server error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Server error' }),
+      JSON.stringify({ error: error.message || "Server error" }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
