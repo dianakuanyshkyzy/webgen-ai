@@ -193,6 +193,8 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
                 imageUrls.map((image, index) => (
                   <div key={index} style={{ position: 'relative', overflow: 'hidden', borderRadius: '10px', cursor: 'pointer' }} onClick={() => openImage(image)}>
                     <Image
+                    width={250}
+                    height={250}
                       src={image}
                       alt={`Memory ${index + 1}`}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease-in-out' }}
@@ -271,7 +273,7 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
       </footer>
       {selectedImage && (
         <div style={{ position: 'fixed', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1000' }} onClick={closeImage}>
-          <Image src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
+          <Image width={250} height={250} src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
         </div>
       )}
     </div>

@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Wish {
-  id       Int     @id @default(autoincrement())
+  id       String     @id @default(uuid())
   wishData Json
   images   Image[] @relation("WishToImages")
 }
@@ -16,7 +16,7 @@ model Wish {
 model Image {
   id        Int      @id @default(autoincrement())
   url       String
-  wishId    Int
+  wishId    String
   wish      Wish     @relation(fields: [wishId], references: [id], name: "WishToImages")
   createdAt DateTime @default(now())
 }

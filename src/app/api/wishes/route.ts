@@ -1,16 +1,16 @@
-import prisma from '@/lib/db';
+import prisma from "@/lib/db";
 
 export async function GET(request: Request) {
-  const queryParameters = request.url.split('?')[1];
-  const id = new URLSearchParams(queryParameters).get('id');
+  const queryParameters = request.url.split("?")[1];
+  const id = new URLSearchParams(queryParameters).get("id");
   if (!id) {
-    return new Response(JSON.stringify({ error: 'Missing id parameter' }), {
+    return new Response(JSON.stringify({ error: "Missing id parameter" }), {
       status: 400,
     });
   }
   const wishData = await prisma.wish.findUnique({
     where: {
-      id: parseInt(id),
+      id: id,
     },
   });
   if (wishData) {
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       status: 200,
     });
   }
-  return new Response(JSON.stringify({ error: 'Wish not found' }), {
+  return new Response(JSON.stringify({ error: "Wish not found" }), {
     status: 404,
   });
 }

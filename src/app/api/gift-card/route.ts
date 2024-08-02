@@ -76,7 +76,10 @@ export async function POST(request: Request) {
     });
 
     return new Response(
-      JSON.stringify({ url: `http://localhost:3000/${id}`, id }),
+      JSON.stringify({
+        url: `${request.headers.get("origin")}/${id}`,
+        id,
+      }),
       {
         status: 200,
         headers: { "Content-Type": "application/json" },
