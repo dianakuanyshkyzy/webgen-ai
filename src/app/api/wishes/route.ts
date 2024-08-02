@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   }
   const wishData = await prisma.wish.findUnique({
     where: {
-      id: id,
+      id: parseInt(id),
     },
   });
   if (wishData) {
