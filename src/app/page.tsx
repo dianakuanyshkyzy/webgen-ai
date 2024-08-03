@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const LoadingOverlay = ({ message }: { message: string }) => (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -43,6 +44,7 @@ export default function Component() {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -196,6 +198,9 @@ export default function Component() {
         console.log('Upload response data:', data);
         await handleUploadSuccess(file); // Call the handleUploadSuccess function with the file
       }
+
+      // Redirect to the generated URL after all files are uploaded
+      router.push(generatedUrl);
     } catch (error) {
       console.log('Error uploading file:', error);
     } finally {
@@ -252,7 +257,7 @@ export default function Component() {
           <>
             <div>
               <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl">
-                Upload Images and Videos
+                Upload images and videos
               </h1>
               <p className="mt-4 text-lg sm:text-xl md:text-2xl">
                 Drag-and-drop your files below.
