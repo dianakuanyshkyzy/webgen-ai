@@ -44,6 +44,7 @@ export default function Component() {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
+  const [songUrl, setSongUrl] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -102,6 +103,7 @@ export default function Component() {
 
       const data = await apiResponse.json();
       console.log('Audio generated and uploaded to S3:', data.s3Url);
+      setSongUrl(data.s3Url); // Save the song URL
     } catch (error: any) {
       console.error('Error generating audio:', error.message);
     }
@@ -176,38 +178,42 @@ export default function Component() {
 
   const uploadFiles = async () => {
     setUploading(true);
-    setLoadingMessage('Uploading files...');
+    setLoadingMessage('Uploading files... \n it may take a minute...');
 
     try {
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
+        for (const file of files) {
+            const formData = new FormData();
+            formData.append("file", file);
 
-        const response = await fetch(`/api/s3-upload?id=${id}&type=${file.type.startsWith('image') ? 'image' : 'video'}`, {
-          method: "POST",
-          body: formData,
-        });
+            const response = await fetch(`/api/s3-upload?id=${id}&type=${file.type.startsWith('image') ? 'image' : 'video'}`, {
+                method: "POST",
+                body: formData,
+            });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error('Upload failed:', errorData);
-          continue;
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Upload failed:', errorData);
+                continue;
+            }
+
+            const data = await response.json();
+            console.log('Upload response data:', data);
+            await handleUploadSuccess(file); // Call the handleUploadSuccess function with the file
         }
 
-        const data = await response.json();
-        console.log('Upload response data:', data);
-        await handleUploadSuccess(file); // Call the handleUploadSuccess function with the file
-      }
+        // Construct the URL with query parameters
+        const urlWithQuery = `${generatedUrl}?songUrl=${encodeURIComponent(songUrl)}`;
 
-      // Redirect to the generated URL after all files are uploaded
-      router.push(generatedUrl);
+        // Redirect to the generated URL after all files are uploaded
+        router.push(urlWithQuery);
     } catch (error) {
-      console.log('Error uploading file:', error);
+        console.log('Error uploading file:', error);
     } finally {
-      setUploading(false);
-      setLoadingMessage(null);
+        setUploading(false);
+        setLoadingMessage(null);
     }
-  };
+};
+
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-400 text-white">
@@ -257,7 +263,7 @@ export default function Component() {
           <>
             <div>
               <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl">
-                Upload images and videos
+                Upload Images and Videos
               </h1>
               <p className="mt-4 text-lg sm:text-xl md:text-2xl">
                 Drag-and-drop your files below.

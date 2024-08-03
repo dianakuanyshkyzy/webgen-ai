@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
+
 interface WishData {
   webData:{
   title: string;
@@ -35,7 +37,14 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
   const [imageUrls, setImageUrls] = useState([]);
-
+  const searchParams = useSearchParams();
+  const songUrl = searchParams.get('songUrl');
+  useEffect(() => {
+    if (songUrl) {
+      const audio = new Audio(songUrl);
+      audio.play();
+    }
+  }, [songUrl]);
   useEffect(() => {
     const fetchGeneratedImages = async () => {
       try {
