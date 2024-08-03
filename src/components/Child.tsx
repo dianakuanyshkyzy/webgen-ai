@@ -28,8 +28,6 @@ import {
 import confetti from "canvas-confetti";
 import { useSpring, animated } from "@react-spring/web";
 import React, { useState, useEffect } from "react";
-import { S3Client, ListObjectsV2Command, GetObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import Image from "next/image";
 
 function AnimatedImage({ src, index, total }: { src: string; index: number; total: number }) {
@@ -88,6 +86,7 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
   const [audio, setAudio] = useState<string | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -142,6 +141,58 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
     }
   }, [id]);
 
+  const playAudio = (audioEl: HTMLAudioElement) => {
+    audioEl.play().then(() => {
+      console.log("Audio is playing");
+    }).catch((error) => {
+      console.error("Auto-play was prevented:", error);
+    });
+  };
+
+  useEffect(() => {
+    const fetchAudio = async () => {
+      try {
+        const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+        if (audioResponse.ok) {
+          const audioData = await audioResponse.json();
+          const audioEl = new Audio(audioData.audio[0]);
+          audioEl.loop = true;
+          setAudioElement(audioEl);
+          setAudio(audioEl.src);
+          playAudio(audioEl);
+        } else {
+          const generateResponse = await fetch("/api/generate-songs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              prompt: webData.recipient,
+              make_instrumental: false,
+              wait_audio: true,
+            }),
+          });
+
+          if (generateResponse.ok) {
+            const data = await generateResponse.json();
+            const audioEl = new Audio(data.audio_url);
+            audioEl.loop = true;
+            setAudioElement(audioEl);
+            setAudio(audioEl.src);
+            playAudio(audioEl);
+          } else {
+            const errorData = await generateResponse.json();
+            console.error("Error generating audio:", errorData.error);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching or generating audio:", error);
+      }
+    };
+
+    fetchAudio();
+  }, [id, webData.recipient]);
+
   const handleNextWish = () => {
     setCurrentWish((prev) => (prev + 1) % webData.wishes.length);
   };
@@ -175,7 +226,11 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
-        setAudio(audioData.audio[0] || null);
+        const audioEl = new Audio(audioData.audio[0]);
+        audioEl.loop = true;
+        setAudio(audioEl.src);
+        setAudioElement(audioEl);
+        playAudio(audioEl);
       } else {
         const generateResponse = await fetch("/api/generate-songs", {
           method: "POST",
@@ -191,7 +246,11 @@ const Child: React.FC<ChildProps> = ({ wishData, id }) => {
 
         if (generateResponse.ok) {
           const data = await generateResponse.json();
-          setAudio(data.audio_url);
+          const audioEl = new Audio(data.audio_url);
+          audioEl.loop = true;
+          setAudio(audioEl.src);
+          setAudioElement(audioEl);
+          playAudio(audioEl);
         } else {
           const errorData = await generateResponse.json();
           console.error("Error generating audio:", errorData.error);

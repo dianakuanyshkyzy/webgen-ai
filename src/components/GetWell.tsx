@@ -1,26 +1,27 @@
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import {Button} from './ui/button';
+import { Button } from './ui/button';
 import Image from "next/image";
+
 interface WishData {
   webData: {
-  title: string;
-  recipient: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string;
-  gender: string;
-  componentType: string;
-  poemabout: string;
-}
+    title: string;
+    recipient: string;
+    about: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    paragraph: string;
+    characteristics: string[];
+    short_paragraph: string;
+    senders: string;
+    gender: string;
+    componentType: string;
+    poemabout: string;
+  }
 }
 
 interface GetWellProps {
@@ -36,9 +37,10 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
   const [showSurprise, setShowSurprise] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [audio, setAudio] = useState<string | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
@@ -90,6 +92,58 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
     }
   }, [id]);
 
+  const playAudio = (audioEl: HTMLAudioElement) => {
+    audioEl.play().then(() => {
+      console.log("Audio is playing");
+    }).catch((error) => {
+      console.error("Auto-play was prevented:", error);
+    });
+  };
+
+  useEffect(() => {
+    const fetchAudio = async () => {
+      try {
+        const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+        if (audioResponse.ok) {
+          const audioData = await audioResponse.json();
+          const audioEl = new Audio(audioData.audio[0]);
+          audioEl.loop = true;
+          setAudioElement(audioEl);
+          setAudio(audioEl.src);
+          playAudio(audioEl);
+        } else {
+          const generateResponse = await fetch("/api/generate-songs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              prompt: webData.recipient,
+              make_instrumental: false,
+              wait_audio: true,
+            }),
+          });
+
+          if (generateResponse.ok) {
+            const data = await generateResponse.json();
+            const audioEl = new Audio(data.audio_url);
+            audioEl.loop = true;
+            setAudioElement(audioEl);
+            setAudio(audioEl.src);
+            playAudio(audioEl);
+          } else {
+            const errorData = await generateResponse.json();
+            console.error("Error generating audio:", errorData.error);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching or generating audio:", error);
+      }
+    };
+
+    fetchAudio();
+  }, [id, webData.recipient]);
+
   const handleNextWish = () => {
     setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
   };
@@ -116,7 +170,11 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
-        setAudio(audioData.audio[0] || null);
+        const audioEl = new Audio(audioData.audio[0]);
+        audioEl.loop = true;
+        setAudio(audioEl.src);
+        setAudioElement(audioEl);
+        playAudio(audioEl);
       } else {
         // Generate audio if it doesn't exist
         const generateResponse = await fetch("/api/generate-songs", {
@@ -133,7 +191,11 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
 
         if (generateResponse.ok) {
           const data = await generateResponse.json();
-          setAudio(data.audio_url);
+          const audioEl = new Audio(data.audio_url);
+          audioEl.loop = true;
+          setAudio(audioEl.src);
+          setAudioElement(audioEl);
+          playAudio(audioEl);
         } else {
           const errorData = await generateResponse.json();
           console.error("Error generating audio:", errorData.error);
@@ -143,7 +205,7 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
       console.error("Error fetching or generating audio:", error);
     }
   };
-  
+
   const nextVideo = () => {
     setCurrentVideo((prev) => (prev + 1) % videos.length);
   };
@@ -196,6 +258,7 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
                     style={{ objectFit: 'cover', width: '100%', height: '100%', transition: 'transform 0.3s ease-in-out' }}
                     width={300}
                     height={300}
+  
                   />
                   <div style={{ position: 'absolute', bottom: '0', width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white', textAlign: 'center', padding: '5px', opacity: '0', transition: 'opacity 0.3s ease-in-out' }} className="description">
                     {`Memory ${index + 1}`}
@@ -208,7 +271,7 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
           </div>
         </section>
         <section style={{ marginBottom: '20px' }}>
-          <h2 style={{ fontSize: '1.25em', fontWeight: '600', marginBottom: '16px', color: '#ff69b4' }}>Videos</h2>
+          <h2 style={{ fontSize: '1.25em', fontWeight: '600', marginBottom: '16px', color: '#ff69b4' }}></h2>
           <div style={{ position: 'relative' }}>
             {videos.length > 0 ? (
               <div>
@@ -227,7 +290,7 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
                 </button>
               </div>
             ) : (
-              <div style={{ color: '#d1d5db' }}>No memories available</div>
+              <div style={{ color: '#d1d5db' }}></div>
             )}
           </div>
         </section>
@@ -237,26 +300,25 @@ const GetWell: React.FC<GetWellProps> = ({ wishData, id }) => {
           <p style={{ color: '#1f2937' }}>{webData.paragraph}</p>
         </section>
         <footer style={{ textAlign: 'center', marginTop: '20px' }}>
-        <Button
-              
-              className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
-              onClick={handleSurpriseClick}
-            >
-              Click me!
-            </Button>
-            {audio && (
-              <div className="mt-4">
-                <audio controls>
-                  <source src={audio} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
-            )}
+          <Button
+            className="rounded-md bg-[#4b5563] px-4 py-2 text-[#f5f5f5] hover:bg-[#6b7280]"
+            onClick={handleSurpriseClick}
+          >
+            Click me!
+          </Button>
+          {audio && (
+            <div className="mt-4">
+              <audio controls>
+                <source src={audio} type="audio/mpeg" />
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          )}
         </footer>
       </div>
       {selectedImage && (
         <div style={{ position: 'fixed', top: '0', left: '0', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: '1000' }} onClick={closeImage}>
-          <Image src={selectedImage} alt="Full format" style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
+          <Image src={selectedImage} alt="Full format" width={900} height={900} style={{ maxHeight: '90%', maxWidth: '90%', borderRadius: '8px' }} />
         </div>
       )}
     </div>

@@ -17,15 +17,14 @@ interface WishData {
     short_paragraph: string;
     characteristics: string[];
     facts: string[];
-    senders: string;
+    senders: string[];
     componentType: string;
     poemabout: string;
     gender: string;
     description: string;
     recipient: string;
     eventDate: string;
-  
-}
+  }
 }
 
 interface ThankyouProps {
@@ -113,18 +112,62 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
 
-  
+  const playAudio = (url: string) => {
+    const audioElement = new Audio(url);
+    audioElement.loop = true;
+    audioElement.play().catch(() => {
+      console.log('Auto-play was prevented. Click the button to play the audio.');
+    });
+    setAudio(url);
+  };
+
+  useEffect(() => {
+    const fetchAudio = async () => {
+      try {
+        // Check if audio already exists in S3
+        const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+        if (audioResponse.ok) {
+          const audioData = await audioResponse.json();
+          playAudio(audioData.audio[0] || null);
+        } else {
+          // Generate audio if it doesn't exist
+          const generateResponse = await fetch("/api/generate-songs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              prompt: webData.recipient,
+              make_instrumental: false,
+              wait_audio: true,
+            }),
+          });
+
+          if (generateResponse.ok) {
+            const data = await generateResponse.json();
+            playAudio(data.audio_url);
+          } else {
+            const errorData = await generateResponse.json();
+            console.error("Error generating audio:", errorData.error);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching or generating audio:", error);
+      }
+    };
+
+    fetchAudio();
+  }, [id, webData.recipient]);
+
   const handleSurpriseClick = async () => {
     try {
       setLoading(true);
-      // Check if audio already exists in S3
       const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
-        setAudio(audioData.audio[0] || null);
+        playAudio(audioData.audio[0] || null);
       } else {
-        // Generate audio if it doesn't exist
         const generateResponse = await fetch("/api/generate-songs", {
           method: "POST",
           headers: {
@@ -139,7 +182,7 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
 
         if (generateResponse.ok) {
           const data = await generateResponse.json();
-          setAudio(data.audio_url);
+          playAudio(data.audio_url);
         } else {
           const errorData = await generateResponse.json();
           console.error("Error generating audio:", errorData.error);
@@ -264,7 +307,7 @@ const ThankYou: React.FC<ThankyouProps> = ({ wishData, id }) => {
         </button>
         <div style={{ marginTop: '20px', color: '#ff69b4', fontWeight: 'bold' }}>
           {audio && (
-            <audio controls>
+            <audio controls autoPlay loop>
               <source src={audio} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>

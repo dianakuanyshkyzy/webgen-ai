@@ -1,26 +1,26 @@
-
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect } from 'react';
-import { useSpring, animated } from 'react-spring';
 import Image from "next/image";
+
 interface WishData {
-  webData:{
-  title: string;
-  recipient: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string;
-  gender: string;
-  componentType:string;
-  poemabout: string;}
+  webData: {
+    title: string;
+    recipient: string;
+    about: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    paragraph: string;
+    characteristics: string[];
+    short_paragraph: string;
+    senders: string;
+    gender: string;
+    componentType: string;
+    poemabout: string;
+  }
 }
 
 interface GraduationProps {
@@ -33,9 +33,10 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
   const [images, setImages] = useState<string[]>([]);
   const [videos, setVideos] = useState<string[]>([]);
   const [audio, setAudio] = useState<string | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGeneratedImages = async () => {
@@ -87,6 +88,58 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
     }
   }, [id]);
 
+  const playAudio = (audioEl: HTMLAudioElement) => {
+    audioEl.play().then(() => {
+      console.log("Audio is playing");
+    }).catch((error) => {
+      console.error("Auto-play was prevented:", error);
+    });
+  };
+
+  useEffect(() => {
+    const fetchAudio = async () => {
+      try {
+        const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
+        if (audioResponse.ok) {
+          const audioData = await audioResponse.json();
+          const audioEl = new Audio(audioData.audio[0]);
+          audioEl.loop = true;
+          setAudioElement(audioEl);
+          setAudio(audioEl.src);
+          playAudio(audioEl);
+        } else {
+          const generateResponse = await fetch("/api/generate-songs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              prompt: webData.recipient,
+              make_instrumental: false,
+              wait_audio: true,
+            }),
+          });
+
+          if (generateResponse.ok) {
+            const data = await generateResponse.json();
+            const audioEl = new Audio(data.audio_url);
+            audioEl.loop = true;
+            setAudioElement(audioEl);
+            setAudio(audioEl.src);
+            playAudio(audioEl);
+          } else {
+            const errorData = await generateResponse.json();
+            console.error("Error generating audio:", errorData.error);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching or generating audio:", error);
+      }
+    };
+
+    fetchAudio();
+  }, [id, webData.recipient]);
+
   const handleNextWish = () => {
     setCurrentWish((prev) => (prev + 1) % webData?.wishes.length);
   };
@@ -106,18 +159,18 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
     return <div>Loading...</div>; // Adjust this to your preferred loading state
   }
 
-  
-
   const handleSurpriseClick = async () => {
     try {
-      // Check if audio already exists in S3
       const audioResponse = await fetch(`/api/s3-audios?id=${id}`);
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
-        setAudio(audioData.audio[0] || null);
+        const audioEl = new Audio(audioData.audio[0]);
+        audioEl.loop = true;
+        setAudio(audioEl.src);
+        setAudioElement(audioEl);
+        playAudio(audioEl);
       } else {
-        // Generate audio if it doesn't exist
         const generateResponse = await fetch("/api/generate-songs", {
           method: "POST",
           headers: {
@@ -132,7 +185,11 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
 
         if (generateResponse.ok) {
           const data = await generateResponse.json();
-          setAudio(data.audio_url);
+          const audioEl = new Audio(data.audio_url);
+          audioEl.loop = true;
+          setAudio(audioEl.src);
+          setAudioElement(audioEl);
+          playAudio(audioEl);
         } else {
           const errorData = await generateResponse.json();
           console.error("Error generating audio:", errorData.error);
@@ -142,7 +199,7 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
       console.error("Error fetching or generating audio:", error);
     }
   };
-    
+
   return (
     <div className="flex flex-col min-h-[100dvh]">
       <header className="bg-gradient-to-r from-blue-600 to-blue-400 py-12 px-4 md:px-6 lg:px-8">
@@ -285,7 +342,7 @@ const Graduation: React.FC<GraduationProps> = ({ wishData, id }) => {
             </Button>
             {audio && (
               <div className="mt-4">
-                <audio controls>
+                <audio controls autoPlay loop>
                   <source src={audio} type="audio/mpeg" />
                   Your browser does not support the audio element.
                 </audio>

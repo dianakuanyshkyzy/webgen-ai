@@ -1,27 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useSpring, animated } from 'react-spring';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 
 interface WishData {
-  webData:{
-  title: string;
-  recipient: string;
-  eventDate: string;
-  about: string;
-  images: string[];
-  quotes: string[];
-  videos: string[];
-  wishes: string[];
-  hobbies: string[];
-  paragraph: string;
-  characteristics: string[];
-  short_paragraph: string;
-  senders: string;
-  gender: string;
-  componentType: string;
-  poemabout: string;
-}
+  webData: {
+    title: string;
+    recipient: string;
+    eventDate: string;
+    about: string;
+    images: string[];
+    quotes: string[];
+    videos: string[];
+    wishes: string[];
+    hobbies: string[];
+    paragraph: string;
+    characteristics: string[];
+    short_paragraph: string;
+    senders: string;
+    gender: string;
+    componentType: string;
+    poemabout: string;
+  };
 }
 
 interface AnniversaryProps {
@@ -36,15 +35,21 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
   const [audio, setAudio] = useState<string | null>(null);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [currentWish, setCurrentWish] = useState(0);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const searchParams = useSearchParams();
   const songUrl = searchParams.get('songUrl');
+
   useEffect(() => {
     if (songUrl) {
-      const audio = new Audio(songUrl);
-      audio.play();
+      const audioElement = new Audio(songUrl);
+      audioElement.loop = true;
+      audioElement.play().catch(() => {
+        console.log('Auto-play was prevented. Click the button to play the audio.');
+      });
+      setAudio(songUrl); // Save the audio URL to state
     }
   }, [songUrl]);
+
   useEffect(() => {
     const fetchGeneratedImages = async () => {
       try {
@@ -102,7 +107,10 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
 
       if (audioResponse.ok) {
         const audioData = await audioResponse.json();
-        setAudio(audioData.audio[0] || null);
+        const audioElement = new Audio(audioData.audio[0]);
+        audioElement.loop = true;
+        setAudio(audioElement.src);
+        audioElement.play();
       } else {
         // Generate audio if it doesn't exist
         const generateResponse = await fetch("/api/generate-songs", {
@@ -119,7 +127,10 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
 
         if (generateResponse.ok) {
           const data = await generateResponse.json();
-          setAudio(data.audio_url);
+          const audioElement = new Audio(data.audio_url);
+          audioElement.loop = true;
+          setAudio(audioElement.src);
+          audioElement.play();
         } else {
           const errorData = await generateResponse.json();
           console.error("Error generating audio:", errorData.error);
@@ -191,9 +202,11 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
         <div className="flex gap-5 justify-between self-stretch px-10 py-3 w-full border-b border-gray-200 border-solid text-neutral-900 max-md:flex-wrap max-md:px-5 max-md:max-w-full">
           <div className="flex gap-4 my-auto text-lg font-bold leading-6 whitespace-nowrap">
             <Image
-              alt="image"
+              alt=""
               loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/TEMP/7a83d6011abf080bfa320b03f7f4be5821d3903a4c089d32e4b7a09fd83acb3a?apiKey=74627f4a04b34f4c896e1b7417ba3997&"
+              width={30}
+              height={30}
+              src="/logo.png"
               className="flex-1 shrink-0 my-auto w-full aspect-square"
             />
             <div>WebGenAI</div>
@@ -204,6 +217,8 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
           <Image
             alt="image"
             loading="lazy"
+            width={1920}
+            height={1080}
             src={imageUrls[0]}
             className="object-cover absolute inset-0 size-full"
           />
@@ -263,6 +278,8 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
                     alt="image"
                     loading="lazy"
                     src={image}
+                    width={600}
+                    height={400}
                     className="grow w-full aspect-[1.82] max-md:max-w-full rounded-xl"
                   />
                 </div>
@@ -272,17 +289,17 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
                       {webData.title}
                     </div>
                     <div className="mt-1 text-lg font-bold leading-6 text-neutral-900 max-md:max-w-full">
-                      Our favorite memories together
+                      Here is what people wish you!
                     </div>
                     <div className="mt-1 text-base max-md:max-w-full">
-                      Share your favorite memories 
+                      {webData.wishes[index % webData.wishes.length]} {/* Display wishes */}
                     </div>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="text-[#d1d5db]">No memories available</div>
+            <div className="text-[#d1d5db]"></div>
           )}
         </div>
         <div className="mt-8 w-full rounded-xl max-w-[928px] max-md:max-w-full">
@@ -294,7 +311,7 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
                     src={video}
                     controls
                     className="grow w-full aspect-[1.82] max-md:max-w-full rounded-xl"
-                  />р
+                  />
                 </div>
                 <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
                   <div className="flex flex-col justify-center p-4 leading-[150%] text-stone-500 max-md:max-w-full">
@@ -302,7 +319,7 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
                       {webData.title}
                     </div>
                     <div className="mt-1 text-lg font-bold leading-6 text-neutral-900 max-md:max-w-full">
-                      Share a message with the couple
+                      {webData.wishes[index % webData.wishes.length]} {/* Display wishes */}
                     </div>
                     <div className="mt-1 text-base max-md:max-w-full">
                       We can't wait to celebrate with you!
@@ -312,7 +329,7 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
               </div>
             ))
           ) : (
-            <div className="text-[#d1d5db]">No memories available</div>
+            <div className="text-[#d1d5db]"></div>
           )}
         </div>
       </div>
@@ -326,14 +343,7 @@ const Anniversary: React.FC<AnniversaryProps> = ({ wishData, id }) => {
           >
             Open Now
           </button>
-          {audio && (
-            <div className="mt-4">
-              <audio controls>
-                <source src={audio} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-            </div>
-          )}
+          
         </div>
       </footer>
     </div>

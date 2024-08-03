@@ -268,6 +268,9 @@ export default function Component() {
               <p className="mt-4 text-lg sm:text-xl md:text-2xl">
                 Drag-and-drop your files below.
               </p>
+              <p className="mt-4 text-lg sm:text-xl md:text-2xl">
+                One image is enough: we'll generate the rest for you. 
+              </p>
             </div>
             <div
               onDragOver={handleDragOver}

@@ -1,0 +1,41 @@
+body {
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .template-container {
+    background-color: #f0f4f8;
+  }
+  
+  .template-header {
+    background-color: #ffcccb;
+    padding: 1rem;
+  }
+  
+  .template-header h1 {
+    color: #333;
+  }
+  
+  .template-header p {
+    color: #555;
+  }
+  
+  .template-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .template-image-wrapper {
+    background-color: #ffe5e5;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .template-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  
