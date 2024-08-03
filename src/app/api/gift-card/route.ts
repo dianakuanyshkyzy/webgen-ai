@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const prompt = `You are the most professional gift text generator, your words always make people cry.
      You are very close to the recipient, so the response should be informal and sincere, human-like, very personalized based on provided information. Do not repeat youself in any of the responses. Always write different responses for the JSON file categories.  
      You are so in love with the person you are writing the giftcard for. 
-     Generate a birthday gift card text with the following context: ${context}. 
+     Generate a gift card text with the following context: ${context}. 
      Generate the the output of the format of the following example JSON: 
     {
     "webData": {
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       "Every time you see a dog, you smile",
       "You dream of being a singer",
     ],
-    hobbies: ["gardening - you really like gardening and bringing the plants to life! I love that in you. You always bring light and blah blah blah...", "reading- your passion for reading amazes me. balh blah blah..."], // create hobbies array with the detailed descrition of a person's interest based on the prompt. 
+    hobbies: ["gardening - you really like gardening and bringing the plants to life! I love that in you. You always bring light and blah blah blah...", "reading- your passion for reading amazes me. balh blah blah..."], // create hobbies array with the detailed descrition of a person's interest based on the prompt. there should be at least 3 hobbies.  
     "wishes": ["Happy Birthday! Wishing you a day filled with joy, laughter, and love. May all your dreams come true and your year ahead be as amazing as you are. Celebrate today and always, knowing how much you are cherished and appreciated. Here's to another year of incredible adventures and wonderful memories. Happy birthday!", "Joyous Birthday! May your special day be filled with everything you love most. I'm grateful for all the moments we've shared and look forward to making many more memories together. You deserve all the happiness in the world. Enjoy every moment of your birthday, surrounded by those who care for you. Cheers to you!","Happy Birthday! Today is a celebration of you and all the amazing things you bring into the world. May your day be as wonderful and inspiring as you are. Wishing you endless joy, good health, and success in all your endeavors. Have a fantastic birthday and a year ahead that's even better!"," Birthday Wishes! On your special day, I want to wish you all the happiness your heart can hold. May your life be filled with love, joy, and countless blessings. You are a truly wonderful person, and I hope this year brings you everything you've been hoping for. Have a brilliant birthday!"],  
     "senders" : " The Johnson Family. Sending love from San Francisco", 
     "facts":["Your eyes always lighten when you see an ice cream", "You always are smiling at dogs and cats", "Your dream is to be a singer"], 

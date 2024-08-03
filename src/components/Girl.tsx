@@ -19,6 +19,7 @@ interface WishData {
   gender: string;
   componentType:string;
   poemabout: string;
+  description: string;
 }
 }
 
@@ -132,7 +133,7 @@ const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            prompt: webData.recipient,
+            prompt: webData.description,
             make_instrumental: false,
             wait_audio: true,
           }),
@@ -382,7 +383,7 @@ return (
             <div className="flex flex-col w-[45%] max-md:ml-0 max-md:w-full">
               <div className="flex flex-col text-gray-800 max-md:mt-8 max-md:max-w-full">
                 <div className="text-4xl font-bold max-md:max-w-full">
-                  {webData.recipient} ...
+                  {webData.recipient}, 
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
                   {webData?.hobbies[0]}
@@ -393,6 +394,8 @@ return (
               <Image
               alt="image"
                 loading="lazy"
+                width={600}
+                height={400}
                 src={imageUrls[0]}
                 className="z-10 grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
@@ -405,6 +408,8 @@ return (
               <Image
               alt="image"
                 loading="lazy"
+                width={600}
+                height={400}
                 src={imageUrls[1]}
                 className="grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
@@ -412,7 +417,7 @@ return (
             <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
               <div className="flex flex-col text-gray-800 max-md:mt-8 max-md:max-w-full">
                 <div className="text-4xl font-bold max-md:max-w-full">
-                {webData.recipient}...
+                {webData.recipient}, 
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
                 {webData.hobbies[1]}
@@ -426,7 +431,7 @@ return (
             <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
               <div className="flex flex-col text-gray-800 max-md:mt-8 max-md:max-w-full">
                 <div className="text-4xl font-bold max-md:max-w-full">
-                {webData.recipient} ...
+                {webData.recipient}, 
                 </div>
                 <div className="mt-4 text-xl leading-8 max-md:max-w-full">
                 {webData.hobbies[2]}
@@ -438,6 +443,8 @@ return (
               alt="image"
                 loading="lazy"
                 src={imageUrls[2]}
+                width={600}
+                height={400}
                 className="grow w-full aspect-[1.01] max-md:mt-8 max-md:max-w-full"
               />
             </div>

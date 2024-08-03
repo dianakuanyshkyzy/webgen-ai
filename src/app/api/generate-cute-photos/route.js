@@ -26,7 +26,7 @@ export async function POST(req) {
   try {
     const scenarios = [
       "holding a bouquet of vibrant flowers, standing in a garden filled with colorful blooms",
-      "playing with a cute dog in a sunny backyard",
+      "playing in a sunny backyard",
       "sitting under a tree, reading an interesting book with a serene expression",
       "building an intricate sandcastle on a beach, surrounded by gentle waves",
       "riding a bicycle down a tree-lined street, smiling with joy",

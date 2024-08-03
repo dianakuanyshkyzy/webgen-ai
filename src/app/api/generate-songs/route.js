@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 export const maxDuration = 60 
+
 const SUNOAI_API_URL = 'https://api5.sunoapi.software/api/generate';
 
 const s3Client = new S3Client({
