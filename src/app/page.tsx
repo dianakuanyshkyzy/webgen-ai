@@ -47,13 +47,13 @@ const InfoModal = ({ onClose }: { onClose: () => void }) => (
       animate={{ scale: 1 }}
       exit={{ scale: 0.8 }}
     >
-      <h2 className="text-2xl font-bold mb-4 text-center sm:text-3xl md:text-4xl lg:text-5xl">
-        Welcome to Our Website Generator!
+      <h2 className="text-xl font-bold mb-4 text-center sm:text-2xl md:text-3xl lg:text-4xl">
+        Welcome to WebGenAI!
       </h2>
-      <p className="mb-2 text-lg sm:text-xl md:text-2xl lg:text-3xl text-center">
+      <p className="mb-4 text-base sm:text-lg md:text-xl lg:text-2xl text-center">
         Here's how you can use our service:
       </p>
-      <ul className="list-disc pl-5 mb-4 space-y-2 text-base sm:text-lg md:text-xl lg:text-2xl">
+      <ul className="list-disc pl-5 mb-4 space-y-1 text-sm sm:text-base md:text-lg lg:text-xl">
         <li className="hover:text-purple-600 transition-colors">Generate a Thank You Website</li>
         <li className="hover:text-purple-600 transition-colors">Get Well Soon Website</li>
         <li className="hover:text-purple-600 transition-colors">Website for Girlfriend/Boyfriend</li>
@@ -62,7 +62,7 @@ const InfoModal = ({ onClose }: { onClose: () => void }) => (
         <li className="hover:text-purple-600 transition-colors">Website for a Child</li>
         <li className="hover:text-purple-600 transition-colors">Graduation Website</li>
       </ul>
-      <p className="mb-4 text-base sm:text-lg md:text-xl lg:text-2xl text-center">
+      <p className="mb-4 text-sm sm:text-base md:text-lg lg:text-xl text-center">
         Start by entering your message and we'll handle the rest. Customize with images and videos for a personal touch.
       </p>
       <Button
@@ -74,6 +74,7 @@ const InfoModal = ({ onClose }: { onClose: () => void }) => (
     </motion.div>
   </motion.div>
 );
+
 
 
 export default function Component() {
