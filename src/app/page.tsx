@@ -242,7 +242,7 @@ export default function Component() {
                 Create a Website in a Minute
               </h1>
               <p className="mt-4 text-lg sm:text-xl md:text-2xl">
-                Enter your message, and we'll generate a website for you.
+                Enter your message, and we'll generate a \ website for you.
               </p>
             </div>
             <form className="space-y-6" onSubmit={handleSubmit}>
