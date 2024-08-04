@@ -240,22 +240,24 @@ const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col ml-5 w-1/5 max-md:ml-0 max-md:w-full">
-            <div
-              className="shrink-0 mt-32 max-w-full aspect-[0.48] w-[241px] max-md:mt-10"
-              style={{
-                backgroundImage: 'url("https://cdn.builder.io/api/v1/image/assets/TEMP/ba5a43fcb79ad8d3576933b7f49acbd2a36d871482760fe106c7fed3811a0bc8?apiKey=74627f4a04b34f4c896e1b7417ba3997&")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                width: '440.49px',
-                height: '804.04px',
-                position: 'absolute',
-                left: '-142px',
-                top: '5px',
-                zIndex: 4,
-              }}
-            />
-          </div>
+          <div className="flex flex-col ml-5 w-1/5 max-md:ml-0 max-md:w-full relative">
+  <div
+    className="shrink-0 mt-32 max-w-full aspect-[0.48] w-[241px] max-md:mt-10 max-md:w-full"
+    style={{
+      backgroundImage: 'url("https://cdn.builder.io/api/v1/image/assets/TEMP/ba5a43fcb79ad8d3576933b7f49acbd2a36d871482760fe106c7fed3811a0bc8?apiKey=74627f4a04b34f4c896e1b7417ba3997&")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      position: 'absolute',
+      left: '0', // align to left side for small screens
+      right: '0', // align to right side for small screens
+      top: '5px',
+      zIndex: 4,
+      opacity: 0.5, // Set transparency to 50%
+    }}
+  />
+</div>
+
+
         </div>
       </div>
       
@@ -516,11 +518,12 @@ const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
       </div>
 
       <Button
-        className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
+         className="rounded-md bg-yellow-300 px-4 py-2 text-yellow-900 hover:bg-yellow-400"
         onClick={handleSurpriseClick}
       >
         Click me!
       </Button>
+      <div id="surprise-section">
       {audio && (
         <div className="mt-4">
           <audio controls>
@@ -529,6 +532,7 @@ const Girlfriend: React.FC<GirlfriendProps> = ({ wishData, id }) => {
           </audio>
         </div>
       )}
+    </div>
     </div>
   );
 };
