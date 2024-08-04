@@ -17,7 +17,7 @@ interface WishData {
     short_paragraph: string;
     characteristics: string[];
     facts: string[];
-    senders: string[];
+    senders: string;
     componentType: string;
     poemabout: string;
     gender: string;
