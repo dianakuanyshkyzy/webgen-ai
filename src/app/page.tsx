@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import {motion} from "framer-motion";
 import { useRouter } from "next/navigation";
 
 const LoadingOverlay = ({ message }: { message: string }) => (
@@ -33,6 +34,47 @@ const LoadingOverlay = ({ message }: { message: string }) => (
     </div>
   </div>
 );
+const InfoModal = ({ onClose }: { onClose: () => void }) => (
+  <motion.div
+    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+  >
+    <motion.div
+      className="bg-white p-6 rounded-lg max-w-lg w-full text-black shadow-lg transform transition-all sm:w-11/12 md:w-2/3 lg:w-1/2"
+      initial={{ scale: 0.8 }}
+      animate={{ scale: 1 }}
+      exit={{ scale: 0.8 }}
+    >
+      <h2 className="text-2xl font-bold mb-4 text-center sm:text-3xl md:text-4xl lg:text-5xl">
+        Welcome to Our Website Generator!
+      </h2>
+      <p className="mb-2 text-lg sm:text-xl md:text-2xl lg:text-3xl text-center">
+        Here's how you can use our service:
+      </p>
+      <ul className="list-disc pl-5 mb-4 space-y-2 text-base sm:text-lg md:text-xl lg:text-2xl">
+        <li className="hover:text-purple-600 transition-colors">Generate a Thank You Website</li>
+        <li className="hover:text-purple-600 transition-colors">Get Well Soon Website</li>
+        <li className="hover:text-purple-600 transition-colors">Website for Girlfriend/Boyfriend</li>
+        <li className="hover:text-purple-600 transition-colors">Invitation to an Event</li>
+        <li className="hover:text-purple-600 transition-colors">Anniversary Website</li>
+        <li className="hover:text-purple-600 transition-colors">Website for a Child</li>
+        <li className="hover:text-purple-600 transition-colors">Graduation Website</li>
+      </ul>
+      <p className="mb-4 text-base sm:text-lg md:text-xl lg:text-2xl text-center">
+        Start by entering your message and we'll handle the rest. Customize with images and videos for a personal touch.
+      </p>
+      <Button
+        onClick={onClose}
+        className="bg-purple-600 text-white py-2 px-4 rounded transition-transform transform hover:scale-105 hover:bg-purple-700 mx-auto block"
+      >
+        Got it!
+      </Button>
+    </motion.div>
+  </motion.div>
+);
+
 
 export default function Component() {
   const [message, setMessage] = useState("");
@@ -45,7 +87,12 @@ export default function Component() {
   const [uploading, setUploading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
   const [songUrl, setSongUrl] = useState("");
+  const [showModal, setShowModal] = useState(true);
   const router = useRouter();
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -220,10 +267,10 @@ export default function Component() {
       setLoadingMessage(null);
     }
   };
-
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-400 text-white">
       {loadingMessage && <LoadingOverlay message={loadingMessage} />}
+      {showModal && <InfoModal onClose={handleCloseModal} />}
       <video
         autoPlay
         muted
@@ -272,7 +319,7 @@ export default function Component() {
             </form>
           </>
         )}
-
+  
         {step === 2 && (
           <>
             <div>
@@ -286,7 +333,7 @@ export default function Component() {
                 One image is enough.
               </p>
             </div>
-
+  
             <div
               onDragOver={handleDragOver}
               onDrop={handleDrop}
@@ -353,25 +400,26 @@ export default function Component() {
       </div>
     </div>
   );
-}
-
-function CloudUploadIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-      <path d="M12 12v9" />
-      <path d="m16 16-4-4-4 4" />
-    </svg>
-  );
-}
+  }
+  
+  function CloudUploadIcon(props: React.SVGProps<SVGSVGElement>) {
+    return (
+      <svg
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+        <path d="M12 12v9" />
+        <path d="m16 16-4-4-4 4" />
+      </svg>
+    );
+  }
+  
