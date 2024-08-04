@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const LoadingOverlay = ({ message }: { message: string }) => (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -35,27 +35,27 @@ const LoadingOverlay = ({ message }: { message: string }) => (
 );
 
 export default function Component() {
-  const [message, setMessage] = useState('');
-  const [generatedUrl, setGeneratedUrl] = useState('');
-  const [id, setId] = useState('');
+  const [message, setMessage] = useState("");
+  const [generatedUrl, setGeneratedUrl] = useState("");
+  const [id, setId] = useState("");
   const [imagesUploaded, setImagesUploaded] = useState(false);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
   const [step, setStep] = useState(1); // Step state to manage the different steps
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
-  const [songUrl, setSongUrl] = useState('');
+  const [songUrl, setSongUrl] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setLoadingMessage('Generating your website...');
+    setLoadingMessage("Generating your website...");
     const formData = new FormData();
-    formData.append('context', message);
+    formData.append("context", message);
 
     try {
-      const response = await fetch('/api/gift-card', {
-        method: 'POST',
+      const response = await fetch("/api/gift-card", {
+        method: "POST",
         body: formData,
       });
 
@@ -73,7 +73,7 @@ export default function Component() {
 
       generateAudio(result.id, message); // Generate audio in the background
     } catch (error: any) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       setGeneratedUrl(`Error: ${error.message}`);
     } finally {
       setLoadingMessage(null);
@@ -82,10 +82,10 @@ export default function Component() {
 
   const generateAudio = async (id: string, message: string) => {
     try {
-      const apiResponse = await fetch('/api/generate-songs', {
-        method: 'POST',
+      const apiResponse = await fetch("/api/generate-songs", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           prompt: message,
@@ -97,33 +97,33 @@ export default function Component() {
 
       if (!apiResponse.ok) {
         const errorData = await apiResponse.json();
-        console.error('Error generating audio:', errorData.error);
+        console.error("Error generating audio:", errorData.error);
         throw new Error(errorData.error);
       }
 
       const data = await apiResponse.json();
-      console.log('Audio generated and uploaded to S3:', data.s3Url);
+      console.log("Audio generated and uploaded to S3:", data.s3Url);
       setSongUrl(data.s3Url); // Save the song URL
     } catch (error: any) {
-      console.error('Error generating audio:', error.message);
+      console.error("Error generating audio:", error.message);
     }
   };
 
   const handleUploadSuccess = async (file: File) => {
-    console.log('Uploaded file:', file);
+    console.log("Uploaded file:", file);
 
     try {
-      const response = await fetch('/api/generate-description', {
-        method: 'POST',
+      const response = await fetch("/api/generate-description", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ id }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error generating description:', errorData.error);
+        console.error("Error generating description:", errorData.error);
         throw new Error(errorData.error);
       }
 
@@ -134,30 +134,30 @@ export default function Component() {
 
       setImagesUploaded(true);
     } catch (error: any) {
-      console.error('Error generating description and images:', error.message);
+      console.error("Error generating description and images:", error.message);
     }
   };
 
   const generateImages = async (id: string, description: string) => {
     try {
-      const response = await fetch('/api/generate-cute-photos', {
-        method: 'POST',
+      const response = await fetch("/api/generate-cute-photos", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ descriptions: [description], id }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error generating images:', errorData.error);
+        console.error("Error generating images:", errorData.error);
         throw new Error(errorData.error);
       }
 
       const data = await response.json();
-      console.log('Images generated and uploaded to S3:', data.generatedImages);
+      console.log("Images generated and uploaded to S3:", data.generatedImages);
     } catch (error: any) {
-      console.error('Error generating images:', error.message);
+      console.error("Error generating images:", error.message);
     }
   };
 
@@ -178,47 +178,58 @@ export default function Component() {
 
   const uploadFiles = async () => {
     setUploading(true);
-    setLoadingMessage('Uploading files... \n it may take a minute...');
+    setLoadingMessage("Uploading files... \n it may take a minute...");
 
     try {
-        for (const file of files) {
-            const formData = new FormData();
-            formData.append("file", file);
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
 
-            const response = await fetch(`/api/s3-upload?id=${id}&type=${file.type.startsWith('image') ? 'image' : 'video'}`, {
-                method: "POST",
-                body: formData,
-            });
+        const response = await fetch(
+          `/api/s3-upload?id=${id}&type=${
+            file.type.startsWith("image") ? "image" : "video"
+          }`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Upload failed:', errorData);
-                continue;
-            }
-
-            const data = await response.json();
-            console.log('Upload response data:', data);
-            await handleUploadSuccess(file); // Call the handleUploadSuccess function with the file
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Upload failed:", errorData);
+          continue;
         }
 
-        // Construct the URL with query parameters
-        const urlWithQuery = `${generatedUrl}?songUrl=${encodeURIComponent(songUrl)}`;
+        const data = await response.json();
+        console.log("Upload response data:", data);
+        await handleUploadSuccess(file); // Call the handleUploadSuccess function with the file
+      }
 
-        // Redirect to the generated URL after all files are uploaded
-        router.push(urlWithQuery);
+      // Construct the URL with query parameters
+      const urlWithQuery = `${generatedUrl}?songUrl=${encodeURIComponent(
+        songUrl
+      )}`;
+
+      // Redirect to the generated URL after all files are uploaded
+      router.push(urlWithQuery);
     } catch (error) {
-        console.log('Error uploading file:', error);
+      console.log("Error uploading file:", error);
     } finally {
-        setUploading(false);
-        setLoadingMessage(null);
+      setUploading(false);
+      setLoadingMessage(null);
     }
-};
-
+  };
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-400 to-indigo-400 text-white">
       {loadingMessage && <LoadingOverlay message={loadingMessage} />}
-      <video autoPlay muted loop className="absolute w-full h-full object-cover z-0">
+      <video
+        autoPlay
+        muted
+        loop
+        className="absolute w-full h-full object-cover z-0"
+      >
         <source src="/background.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
@@ -251,14 +262,17 @@ export default function Component() {
                 </div>
               </div>
               <div>
-                <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <Button
+                  type="submit"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+                >
                   Generate Website
                 </Button>
               </div>
             </form>
           </>
         )}
-        
+
         {step === 2 && (
           <>
             <div>
@@ -268,18 +282,23 @@ export default function Component() {
               <p className="mt-4 text-lg sm:text-xl md:text-2xl">
                 Drag-and-drop your files below.
               </p>
-              <p className="mt-4 text-lg sm:text-xl md:text-2xl">
-                One image is enough: we'll generate the rest for you. 
+              <p className="mt-2 text-xs sm:text-sm md:text-base">
+                One image is enough.
               </p>
             </div>
+
             <div
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               className="flex flex-col items-center justify-center w-full h-64 p-8 border-2 border-dashed border-primary rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors"
             >
               <CloudUploadIcon className="w-12 h-12 text-primary" />
-              <h3 className="mt-4 text-lg font-medium text-primary">Drag and drop files here</h3>
-              <p className="mt-2 text-sm text-muted-foreground">or click to select files</p>
+              <h3 className="mt-4 text-lg font-medium text-primary">
+                Drag and drop files here
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                or click to select files
+              </p>
               <input
                 type="file"
                 multiple
@@ -299,15 +318,23 @@ export default function Component() {
                     </thead>
                     <tbody>
                       {files.map((file, index) => (
-                        <tr key={index} className="border-b border-muted/20 last:border-b-0 hover:bg-muted/10">
+                        <tr
+                          key={index}
+                          className="border-b border-muted/20 last:border-b-0 hover:bg-muted/10"
+                        >
                           <td className="px-4 py-3 text-left">{file.name}</td>
-                          <td className="px-4 py-3 text-right">{(file.size / 1024 / 1024).toFixed(2)} MB</td>
+                          <td className="px-4 py-3 text-right">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-                <Button onClick={uploadFiles} className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 mt-4 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <Button
+                  onClick={uploadFiles}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 mt-4 rounded-lg shadow-lg transition-transform transform hover:scale-105"
+                >
                   {uploading ? "Uploading..." : "Upload Files"}
                 </Button>
               </>
